@@ -1,6 +1,10 @@
 spring:
   application:
     name: dispatch
+  kafka:
+    bootstrap-servers: localhost:9092
+    consumer:
+      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
   docker:
     compose:
       enabled: false
