@@ -1,0 +1,42 @@
+name: Package Cleanup
+run-name: >
+  ${{ github.workflow }}: ${{ github.event_name }} for ${{ github.ref_name }} by @${{ github.actor }}
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '5 1 * * *' # daily at 1:05
+  
+# TODO: draft has been implemented in project spring-6-resttemplate and spring-6-rest-mvc       
+jobs:
+
+  cleanup-maven-package:
+
+    runs-on: ubuntu-latest
+
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - uses: actions/delete-package-versions@v5
+        id: delete-all-feature-and-pr-package
+        if: false
+        with:
+          # TODO: correct package name. List packages before and after deletion
+          package-name: 'ch.dboeckli.template.spring-6-project-template'
+          package-type: 'maven'
+          # This regex ignores versions that do NOT contain '_feature_' or '_PR_feature_'
+          # Effectively, it targets only feature and PR packages for deletion
+          ignore-versions: '^((?!(_feature_|_PR_feature_)).)*$'
+
+      - uses: actions/delete-package-versions@v5
+        id: delete-all-packages
+        if: false
+        with:
+          # TODO: correct package name. List packages before and after deletion
+          package-name: 'ch.dboeckli.template.spring-6-project-template'
+          package-type: 'maven'
+          # This regex ignores versions that match the semantic versioning pattern (e.g., 1.0.0)
+          # It will keep these versions and delete others
+          ignore-versions: '^\\d+\\.\\d+\\.\\d+$'

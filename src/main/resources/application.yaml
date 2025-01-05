@@ -1,0 +1,43 @@
+spring:
+  application:
+    # // TODO: RENAME ME
+    name: spring-6-project-template
+  docker:
+    compose:
+      enabled: false
+
+management:
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always
+
+logging:
+  level:
+    org.zalando.logbook: TRACE
+
+logbook:
+  filter:
+    enabled: true
+  format:
+    style: http
+  obfuscate:
+    headers:
+      - Authorization
+      - X-Secret
+    parameters:
+      - access_token
+      - password
+  predicate:
+    exclude:
+      - path: /actuator/health
