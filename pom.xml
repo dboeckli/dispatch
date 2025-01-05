@@ -115,6 +115,7 @@
             <optional>true</optional>
         </dependency>
 
+        <!--
         <dependency>
             <groupId>org.zalando</groupId>
             <artifactId>logbook-spring-boot-starter</artifactId>
@@ -130,6 +131,7 @@
             <artifactId>logstash-logback-encoder</artifactId>
             <version>${logstash-logback.version}</version>
         </dependency>
+        -->
 
         <dependency>
             <groupId>org.projectlombok</groupId>
