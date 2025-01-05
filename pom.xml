@@ -8,11 +8,9 @@
         <relativePath /> <!-- lookup parent from repository -->
     </parent>
 
-    <!-- TODO: RENAME ME -->
-    <groupId>ch.dboeckli.template</groupId>
-    <!-- TODO: RENAME ME -->
-    <artifactId>spring-6-project-template</artifactId>
-    <version>0.0.13-SNAPSHOT</version>
+    <groupId>dev.lydtech</groupId>
+    <artifactId>dispatch</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
 
     <name>${project.artifactId}</name>
     <description>${project.artifactId}</description>
@@ -100,11 +98,15 @@
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-actuator</artifactId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
-            <artifactId>spring-boot-starter-web</artifactId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -138,6 +140,11 @@
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.kafka</groupId>
+            <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
     </dependencies>
