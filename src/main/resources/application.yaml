@@ -1,7 +1,6 @@
 spring:
   application:
-    # // TODO: RENAME ME
-    name: spring-6-project-template
+    name: dispatch
   docker:
     compose:
       enabled: false
