@@ -11,10 +11,8 @@ import java.util.UUID;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class OrderCreated {
+public class OrderDispatched {
 
     UUID orderId;
-
-    String item;
 
 }

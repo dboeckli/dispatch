@@ -21,13 +21,27 @@ class OrderCreatedHandlerTest {
     }
 
     @Test
-    void listen() {
+    void testListen_Success() throws Exception {
         OrderCreated orderCreated = OrderCreated.builder()
             .orderId(UUID.randomUUID())
             .item("item")
             .build();
 
         handler.listen(orderCreated);
+        verify(dispatchServiceMock, times(1)).process(orderCreated);
+    }
+
+    @Test
+    public void testListen_ServiceThrowsException() throws Exception {
+        OrderCreated orderCreated = OrderCreated.builder()
+            .orderId(UUID.randomUUID())
+            .item("item")
+            .build();
+
+        doThrow(new RuntimeException("Service failure")).when(dispatchServiceMock).process(orderCreated);
+
+        handler.listen(orderCreated);
+
         verify(dispatchServiceMock, times(1)).process(orderCreated);
     }
 

@@ -11,7 +11,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @RequiredArgsConstructor
 public class OrderCreatedHandler {
-    
+
     final DispatchService dispatchService;
 
     @KafkaListener(
@@ -19,9 +19,13 @@ public class OrderCreatedHandler {
         topics = "order.created",
         groupId = "dispatch.order.created.consumer"
     )
-    public void listen(OrderCreated payload) {
-        log.info("Payload {}", payload);
-        dispatchService.process(payload);
+    public void listen(OrderCreated orderCreated) {
+        log.info("Payload {}", orderCreated);
+        try {
+            dispatchService.process(orderCreated);
+        } catch (Exception e) {
+            log.error("Error processing payload {}", orderCreated, e);
+        }
     }
-    
+
 }
