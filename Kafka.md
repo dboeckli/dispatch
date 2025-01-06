@@ -36,6 +36,22 @@ tar -xvf ../kafka_2.13-3.9.0.tgz
     ```
     bin/kafka-server-start.sh config/kraft/server.properties
     ```
+    See https://docs.conduktor.io/desktop/kafka-cluster-connection/setting-up-a-connection-to-kafka/connecting-to-kafka-running-on-windows-wsl-2/#two-ways-to-fix-this
+    and https://stackoverflow.com/questions/46158296/kafka-broker-not-available-at-starting for connections issues
+    I changed the config/kraft/server.properties file
+    ```
+    #listeners=PLAINTEXT://:9092,CONTROLLER://:9093
+    listeners=PLAINTEXT://[::1]:9092,CONTROLLER://:9093
+    
+    # Name of listener used for communication between brokers.
+    inter.broker.listener.name=PLAINTEXT
+    
+    # Listener name, hostname and port the broker or the controller will advertise to clients.
+    # If not set, it uses the value for "listeners".
+    #advertised.listeners=PLAINTEXT://localhost:9092,CONTROLLER://localhost:9093
+    advertised.listeners=PLAINTEXT://[::1]:9092
+    ```
+    Therefore, you need to change the bootstrap-server parameter in the commands below to ```--bootstrap-server [::1]:9092``` as well
   - stop kafka
     ```
     bin/kafka-server-stop.sh

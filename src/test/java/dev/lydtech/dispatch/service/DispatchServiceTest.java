@@ -1,7 +1,10 @@
 package dev.lydtech.dispatch.service;
 
+import dev.lydtech.dispatch.message.OrderCreated;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+
+import java.util.UUID;
 
 class DispatchServiceTest {
 
@@ -14,7 +17,11 @@ class DispatchServiceTest {
 
     @Test
     void process() {
-        service.process("payload");
+        OrderCreated orderCreated = OrderCreated.builder()
+            .orderId(UUID.randomUUID())
+            .item("item")
+            .build();
+        service.process(orderCreated);
     }
 
 }

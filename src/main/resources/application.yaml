@@ -2,9 +2,21 @@ spring:
   application:
     name: dispatch
   kafka:
-    bootstrap-servers: localhost:9092
+    # See: https://docs.conduktor.io/desktop/kafka-cluster-connection/setting-up-a-connection-to-kafka/connecting-to-kafka-running-on-windows-wsl-2/#two-ways-to-fix-this
+    # and: https://stackoverflow.com/questions/46158296/kafka-broker-not-available-at-starting
+    bootstrap-servers: "[::1]:9092"
+    
+    admin:
+      properties:
+        bootstrap.servers: "[::1]:9092"
     consumer:
-      value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      bootstrap-servers: "[::1]:9092"
+      #value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
+      properties:
+        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
+        spring.json.value.default.type: dev.lydtech.dispatch.message.OrderCreated
+  
   docker:
     compose:
       enabled: false
