@@ -20,6 +20,8 @@ spring:
   docker:
     compose:
       enabled: false
+      stop:
+        command: down  
 
 management:
   health:
@@ -36,23 +38,3 @@ management:
       probes:
         enabled: true
       show-details: always
-
-logging:
-  level:
-    org.zalando.logbook: TRACE
-
-logbook:
-  filter:
-    enabled: true
-  format:
-    style: http
-  obfuscate:
-    headers:
-      - Authorization
-      - X-Secret
-    parameters:
-      - access_token
-      - password
-  predicate:
-    exclude:
-      - path: /actuator/health
