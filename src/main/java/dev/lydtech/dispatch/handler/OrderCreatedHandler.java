@@ -12,15 +12,17 @@ import org.springframework.stereotype.Component;
 @RequiredArgsConstructor
 public class OrderCreatedHandler {
 
+    public static final String ORDER_CREATED_TOPIC = "order.created";
+    public static final String ORDER_CREATED_TOPIC_GROUP_ID = "dispatch.order.created.consumer";
+
     final DispatchService dispatchService;
 
     @KafkaListener(
         id = "orderConsumerClient",
-        topics = "order.created",
-        groupId = "dispatch.order.created.consumer"
-    )
+        topics = ORDER_CREATED_TOPIC,
+        groupId = ORDER_CREATED_TOPIC_GROUP_ID)
     public void listen(OrderCreated orderCreated) {
-        log.info("Payload {}", orderCreated);
+        log.info("### Payload {}", orderCreated);
         try {
             dispatchService.process(orderCreated);
         } catch (Exception e) {

@@ -12,12 +12,12 @@ import org.springframework.stereotype.Service;
 @RequiredArgsConstructor
 public class DispatchService {
 
-    static final String ORDER_DISPATCHED_TOPIC = "order.dispatched";
+    public static final String ORDER_DISPATCHED_TOPIC = "order.dispatched";
 
     private final KafkaTemplate<String, Object> kafkaProducer;
 
     public void process(OrderCreated orderCreated) throws Exception {
-        log.info("process payload {}", orderCreated);
+        log.info("### process payload {}", orderCreated);
         OrderDispatched orderDispatched = OrderDispatched.builder()
             .orderId(orderCreated.getOrderId())
             .build();
