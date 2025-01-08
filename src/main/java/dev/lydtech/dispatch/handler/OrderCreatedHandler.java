@@ -13,7 +13,7 @@ import org.springframework.stereotype.Component;
 public class OrderCreatedHandler {
 
     public static final String ORDER_CREATED_TOPIC = "order.created";
-    public static final String ORDER_CREATED_TOPIC_GROUP_ID = "dispatch.order.created.consumer";
+    public static final String ORDER_CREATED_TOPIC_GROUP_ID = "dispatch.order.created.group";
 
     final DispatchService dispatchService;
 

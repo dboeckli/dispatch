@@ -25,11 +25,13 @@ public class DispatchService {
             .orderId(orderCreated.getOrderId())
             .build();
         kafkaProducer.send(DISPATCH_TRACKING_TOPIC, dispatchPreparing).get();
+        log.info("### dispatch tracking message for order {} has been sent", dispatchPreparing.getOrderId());
         
         OrderDispatched orderDispatched = OrderDispatched.builder()
             .orderId(orderCreated.getOrderId())
             .build();
         kafkaProducer.send(ORDER_DISPATCHED_TOPIC, orderDispatched).get();
+        log.info("### dispatch message for order {} has been sent", orderDispatched.getOrderId());
     }
 
 }
