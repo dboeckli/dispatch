@@ -27,10 +27,9 @@ services:
       KAFKA_LOG_RETENTION_HOURS: 168  # Keep logs for 7 days.
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0  # No delay for consumer rebalancing.
       CLUSTER_ID: "Mk3OEYBSD34fcwNTJENDM2Qk" 
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
+    #volumes:
       # Diese Zeile definiert ein Volume-Mapping. Es verbindet das ./kafka-data-Verzeichnis auf dem Host-System mit dem /var/lib/kafka/data-Verzeichnis im Kafka-Container.
-      - kafka_data:/var/lib/kafka/data  # Store Kafka logs on your local machine.  
+      #- kafka_data:/var/lib/kafka/data  # Store Kafka logs on your local machine.  
   tracking-service:
     container_name: tracking-service
     image: domboeckli/tracking:0.0.1-SNAPSHOT
@@ -47,6 +46,6 @@ services:
         condition: service_started
         required: true
         
-volumes:
-  kafka_data:        
+#volumes:
+#  kafka_data:        
 
