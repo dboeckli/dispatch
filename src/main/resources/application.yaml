@@ -9,6 +9,8 @@ spring:
     admin:
       properties:
         bootstrap.servers: "[::1]:9092"
+      auto-create: false
+      
     consumer:
       bootstrap-servers: "[::1]:9092"
       #value-deserializer: org.apache.kafka.common.serialization.StringDeserializer

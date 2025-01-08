@@ -29,5 +29,4 @@ public class OrderCreatedHandler {
             log.error("Error processing payload {}", orderCreated, e);
         }
     }
-
 }

@@ -9,7 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 public class DispatchApplication {
 
     public static void main(String[] args) {
-        log.info("Starting Spring 6 Template Application...");
+        log.info("Starting Application...");
         SpringApplication.run(DispatchApplication.class, args);
     }
 

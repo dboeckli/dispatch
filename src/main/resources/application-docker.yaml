@@ -7,6 +7,7 @@ spring:
     bootstrap-servers: "[::1]:29092"
     
     admin:
+      auto-create: false
       properties:
         bootstrap.servers: "[::1]:29092"
     consumer:

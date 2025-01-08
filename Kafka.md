@@ -86,7 +86,7 @@ tar -xvf ../kafka_2.13-3.9.0.tgz
     ```
     bin/kafka-topics.sh --bootstrap-server localhost:9092 --alter --topic my.new.topic  --partitions 3
     ```
-  - set number of partitions
+  - delete topic
     ```
     bin/kafka-topics.sh --bootstrap-server localhost:9092 --delete --topic my.new.topic
     ```
