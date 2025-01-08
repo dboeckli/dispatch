@@ -30,7 +30,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       # Diese Zeile definiert ein Volume-Mapping. Es verbindet das ./kafka-data-Verzeichnis auf dem Host-System mit dem /var/lib/kafka/data-Verzeichnis im Kafka-Container.
-      - ./kafka-data:/var/lib/kafka/data  # Store Kafka logs on your local machine.  
+      - kafka_data:/var/lib/kafka/data  # Store Kafka logs on your local machine.  
   tracking-service:
     container_name: tracking-service
     image: domboeckli/tracking:0.0.1-SNAPSHOT
@@ -46,4 +46,7 @@ services:
       kafka:
         condition: service_started
         required: true
+        
+volumes:
+  kafka_data:        
 

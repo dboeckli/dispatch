@@ -4,9 +4,6 @@ import dev.lydtech.dispatch.message.DispatchPreparing;
 import dev.lydtech.dispatch.message.OrderCreated;
 import dev.lydtech.dispatch.message.OrderDispatched;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.kafka.clients.admin.AdminClient;
-import org.apache.kafka.clients.admin.AdminClientConfig;
-import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
 import org.apache.kafka.clients.consumer.ConsumerRecords;
@@ -24,10 +21,10 @@ import org.springframework.kafka.support.serializer.JsonDeserializer;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.UUID;
+import java.util.concurrent.ExecutionException;
 
 import static dev.lydtech.dispatch.handler.OrderCreatedHandler.ORDER_CREATED_TOPIC;
 import static dev.lydtech.dispatch.service.DispatchService.DISPATCH_TRACKING_TOPIC;
@@ -52,23 +49,6 @@ public class OrderCreatedHandlerIT {
 
     @BeforeEach
     void setUp() {
-        // create topics
-        Properties properties = new Properties();
-        properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        try (AdminClient adminClient = AdminClient.create(properties)) {
-            //adminClient.createTopics(Collections.singletonList(new NewTopic(ORDER_DISPATCHED_TOPIC, 1, (short) 1)));
-            //adminClient.createTopics(Collections.singletonList(new NewTopic(ORDER_CREATED_TOPIC, 1, (short) 1)));
-            //adminClient.createTopics(Collections.singletonList(new NewTopic(DISPATCH_TRACKING_TOPIC, 1, (short) 1)));
-            NewTopic orderDispatchedTopic = new NewTopic(ORDER_DISPATCHED_TOPIC, 1, (short) 1)
-                .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))); // 1 hour in milliseconds
-            NewTopic orderCreatedTopic = new NewTopic(ORDER_CREATED_TOPIC, 1, (short) 1)
-                .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))); // 1 hour in milliseconds
-            NewTopic dispatchTrackingTopic = new NewTopic(DISPATCH_TRACKING_TOPIC, 1, (short) 1)
-                .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))); // 1 hour in milliseconds
-
-            adminClient.createTopics(Arrays.asList(orderDispatchedTopic, orderCreatedTopic, dispatchTrackingTopic));
-        }
-
         consumerCreated = new KafkaConsumer<>(createConsumerProps("consumerCreatedGroupId"));
         consumerDispatched = new KafkaConsumer<>(createConsumerProps("consumerDispatchedGroupId"));
         consumerDispatchedTracking = new KafkaConsumer<>(createConsumerProps("consumerDispatchedTrackingGroupId"));
@@ -97,6 +77,20 @@ public class OrderCreatedHandlerIT {
         if (consumerDispatchedTracking != null) {
             consumerDispatchedTracking.close();
         }
+        /*
+        Properties properties = new Properties();
+        properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
+        try (AdminClient adminClient = AdminClient.create(properties)) {
+            adminClient.deleteRecords(
+                Arrays.asList(ORDER_CREATED_TOPIC, ORDER_DISPATCHED_TOPIC, DISPATCH_TRACKING_TOPIC)
+                    .stream()
+                    .collect(Collectors.toMap(
+                        topic -> new TopicPartition(topic, 0),
+                        topic -> RecordsToDelete.beforeOffset(Long.MAX_VALUE)
+                    ))
+            );
+        }
+        */
     }
     
     @Test
