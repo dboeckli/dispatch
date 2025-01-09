@@ -32,3 +32,9 @@ Send a message to the order.created topic
 bin/kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic order.created
 >{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"} 
 ```
+When started with docker
+```
+bin/kafka-console-producer.sh --bootstrap-server localhost:29092 --topic order.created
+>{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"} 
+```
+
