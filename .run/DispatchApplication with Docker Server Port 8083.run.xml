@@ -1,0 +1,13 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="DispatchApplication with Docker Server Port 8083" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="docker" />
+    <envs>
+      <env name="SERVER_PORT" value="8083" />
+    </envs>
+    <module name="dispatch" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="dev.lydtech.dispatch.DispatchApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
