@@ -15,16 +15,15 @@ import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.context.annotation.Import;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
 import java.time.Duration;
 import java.util.Collections;
 import java.util.Properties;
 import java.util.UUID;
-import java.util.concurrent.ExecutionException;
 
 import static dev.lydtech.dispatch.handler.OrderCreatedHandler.ORDER_CREATED_TOPIC;
 import static dev.lydtech.dispatch.service.DispatchService.DISPATCH_TRACKING_TOPIC;
@@ -32,8 +31,8 @@ import static dev.lydtech.dispatch.service.DispatchService.ORDER_DISPATCHED_TOPI
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
-@Import(OrderCreatedHandler.class)
 @ActiveProfiles("docker")
+@DirtiesContext
 @Slf4j
 public class OrderCreatedHandlerIT {
 
@@ -77,20 +76,6 @@ public class OrderCreatedHandlerIT {
         if (consumerDispatchedTracking != null) {
             consumerDispatchedTracking.close();
         }
-        /*
-        Properties properties = new Properties();
-        properties.put(AdminClientConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
-        try (AdminClient adminClient = AdminClient.create(properties)) {
-            adminClient.deleteRecords(
-                Arrays.asList(ORDER_CREATED_TOPIC, ORDER_DISPATCHED_TOPIC, DISPATCH_TRACKING_TOPIC)
-                    .stream()
-                    .collect(Collectors.toMap(
-                        topic -> new TopicPartition(topic, 0),
-                        topic -> RecordsToDelete.beforeOffset(Long.MAX_VALUE)
-                    ))
-            );
-        }
-        */
     }
     
     @Test

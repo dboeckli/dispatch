@@ -1,0 +1,42 @@
+spring:
+  application:
+    name: dispatch
+  kafka:
+    # See: https://docs.conduktor.io/desktop/kafka-cluster-connection/setting-up-a-connection-to-kafka/connecting-to-kafka-running-on-windows-wsl-2/#two-ways-to-fix-this
+    # and: https://stackoverflow.com/questions/46158296/kafka-broker-not-available-at-starting
+    bootstrap-servers: ${spring.embedded.kafka.brokers}
+    
+    admin:
+      auto-create: false
+      properties:
+        bootstrap.servers: ${spring.embedded.kafka.brokers}
+    consumer:
+      # configs below are not taken anymore because we have the DispatchConfiguration class
+      bootstrap-servers: ${spring.embedded.kafka.brokers}
+      properties:
+        spring.json.trusted.packages: "*"
+        allow.auto.create.topics: true
+  
+  docker:
+    compose:
+      enabled: false
+      stop:
+        command: down
+      skip:
+        in-tests: true  
+
+management:
+  health:
+    readinessstate:
+      enabled: true
+    livenessstate:
+      enabled: true
+  endpoints:
+    web:
+      exposure:
+        include: "*"
+  endpoint:
+    health:
+      probes:
+        enabled: true
+      show-details: always

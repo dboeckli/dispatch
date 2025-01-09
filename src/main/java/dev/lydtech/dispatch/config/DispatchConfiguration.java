@@ -28,7 +28,10 @@ public class DispatchConfiguration {
     }
 
     @Bean
-    public ConsumerFactory<String, Object> consumerFactory(@Value("${spring.kafka.bootstrap-servers}") String bootstrapServers) {
+    public ConsumerFactory<String, Object> consumerFactory(
+        @Value("${spring.kafka.bootstrap-servers}") String bootstrapServers, 
+        @Value("${spring.kafka.consumer.properties.allow.auto.create.topics}") Boolean allowAutoCreateTopics) {
+        
         Map<String, Object> config = new HashMap<>();
         config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
@@ -37,7 +40,7 @@ public class DispatchConfiguration {
         config.put(ErrorHandlingDeserializer.VALUE_DESERIALIZER_CLASS, JsonDeserializer.class);
         config.put(JsonDeserializer.VALUE_DEFAULT_TYPE, OrderCreated.class.getCanonicalName());
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, "false");
+        config.put(ConsumerConfig.ALLOW_AUTO_CREATE_TOPICS_CONFIG, allowAutoCreateTopics);
 
         return new DefaultKafkaConsumerFactory<>(config);
     }
