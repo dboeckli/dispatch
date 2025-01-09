@@ -1,9 +1,15 @@
 # Kafka installation
 
 We install Kafka in WSL. 
-TODO: ADD INSTRUCTION FOR INSTALLATION OF WSL
-See: https://github.com/lydtechconsulting/introduction-to-kafka-with-spring-boot/wiki/Installing-and-Running-Kafka-on-Windows
 
+See: https://github.com/lydtechconsulting/introduction-to-kafka-with-spring-boot/wiki/Installing-and-Running-Kafka-on-Windows
+After successfull kafka installation you can export/import the kafka image.
+```
+wsl --export Ubuntu-Initial C:\development\data\wsl-distros\ubuntu-kafka.tar.gz
+wsl --import Ubuntu-Kafka C:\development\data\wsl-distros\Ubuntu-Kafka C:\development\data\wsl-distros\ubuntu-kafka.tar.gz
+```
+
+## Kafka Installtion on WSL
 - Upgrade
 ```
 sudo apt update

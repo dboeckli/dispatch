@@ -27,6 +27,7 @@ bin/kafka-topics.sh --bootstrap-server 127.0.0.1:29092 --list
 bin/kafka-topics.sh --bootstrap-server [::1]:29092 --list
 ```
 
+Send a message to the order.created topic
 ```
 bin/kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic order.created
 >{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"} 
