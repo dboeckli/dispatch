@@ -395,7 +395,7 @@
                 <executions>
                     <execution>
                         <configuration>
-                            <!--suppress UnresolvedMavenProperty -->
+                            <!--suppress UnresolvedMavenProperty. argline is set by jacoco -->
                             <argLine>${argLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
                         </configuration>
                         <goals>
@@ -411,7 +411,7 @@
                 <executions>
                     <execution>
                         <configuration>
-                            <!--suppress UnresolvedMavenProperty -->
+                            <!--suppress UnresolvedMavenProperty. argline is set by jacoco -->
                             <argLine>${argLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
                         </configuration>
                         <goals>
