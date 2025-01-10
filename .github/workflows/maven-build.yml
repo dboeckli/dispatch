@@ -141,6 +141,7 @@ jobs:
             ./target/surefire-reports/TEST-*.xml
             ./target/failsafe-reports/TEST-*.xml
             
+      # TODO: MOVE TO JOB. SEE TICKET https://github.com/dboeckli/spring-6-project-template/issues/26
       - name: analyze
         env:
           GITHUB_ACTOR: ${{ github.actor }}
