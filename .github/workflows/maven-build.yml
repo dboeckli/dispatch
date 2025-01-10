@@ -140,3 +140,41 @@ jobs:
           files: |
             ./target/surefire-reports/TEST-*.xml
             ./target/failsafe-reports/TEST-*.xml
+            
+      # TODO: MOVE TO JOB. SEE TICKET https://github.com/dboeckli/spring-6-project-template/issues/26
+      - name: analyze
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          BRANCH_MVN_VERSION: ${{needs.setup.outputs.BRANCH_MVN_VERSION}}
+          BRANCH_NAME: ${{needs.setup.outputs.BRANCH_NAME}}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+        run: |
+          set -o pipefail    # don't hide errors within pipes
+          set -o nounset     # abort on unbound variable
+          set -o errexit     # abort on nonzero exit status
+          
+          if [[ "${BRANCH_NAME}" == "master" ||  "${BRANCH_NAME}" == "main" ]]; then
+            mvn -B sonar:sonar \
+                  -s $GITHUB_WORKSPACE/settings.xml \
+                  -Dsonar.token=${SONAR_TOKEN} \
+                  -Dsonar.host.url=https://sonarcloud.io \
+                  -Dsonar.sourceEncoding=UTF-8 \
+                  -Dsonar.organization=dboeckli \
+                  -Dsonar.projectKey=dboeckli_dispatch \
+                  -Dsonar.branch.name=master
+          else
+            mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
+            mvn -B sonar:sonar \
+                  -s $GITHUB_WORKSPACE/settings.xml \
+                  -Dsonar.token=${SONAR_TOKEN} \
+                  -Dsonar.host.url=https://sonarcloud.io \
+                  -Dsonar.sourceEncoding=UTF-8 \
+                  -Dsonar.organization=dboeckli \
+                  -Dsonar.projectKey=dboeckli_dispatch \
+                  -Dsonar.branch.name=${BRANCH_NAME} \
+                  -Dsonar.branch.target=master
+          fi
+        
