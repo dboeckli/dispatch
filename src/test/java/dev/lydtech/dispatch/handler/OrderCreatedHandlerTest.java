@@ -5,8 +5,7 @@ import dev.lydtech.dispatch.service.DispatchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
-import java.util.UUID;
-
+import static java.util.UUID.randomUUID;
 import static org.mockito.Mockito.*;
 
 class OrderCreatedHandlerTest {
@@ -22,27 +21,31 @@ class OrderCreatedHandlerTest {
 
     @Test
     void testListen_Success() throws Exception {
+        String givenKey = randomUUID().toString();
+        Integer givenPartition = 0;
         OrderCreated orderCreated = OrderCreated.builder()
-            .orderId(UUID.randomUUID())
+            .orderId(randomUUID())
             .item("item")
             .build();
 
-        handler.listen(orderCreated);
-        verify(dispatchServiceMock, times(1)).process(orderCreated);
+        handler.listen(givenPartition, givenKey, orderCreated);
+        verify(dispatchServiceMock, times(1)).process(givenKey, orderCreated);
     }
 
     @Test
     public void testListen_ServiceThrowsException() throws Exception {
+        String givenKey = randomUUID().toString();
+        Integer givenPartition = 0;
         OrderCreated orderCreated = OrderCreated.builder()
-            .orderId(UUID.randomUUID())
+            .orderId(randomUUID())
             .item("item")
             .build();
 
-        doThrow(new RuntimeException("Service failure")).when(dispatchServiceMock).process(orderCreated);
+        doThrow(new RuntimeException("Service failure")).when(dispatchServiceMock).process(givenKey, orderCreated);
 
-        handler.listen(orderCreated);
+        handler.listen(givenPartition, givenKey, orderCreated);
 
-        verify(dispatchServiceMock, times(1)).process(orderCreated);
+        verify(dispatchServiceMock, times(1)).process(givenKey, orderCreated);
     }
 
 }
