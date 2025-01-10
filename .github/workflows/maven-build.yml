@@ -166,7 +166,7 @@ jobs:
                 -Dsonar.host.url=https://sonarcloud.io \
                 -Dsonar.sourceEncoding=UTF-8 \
                 -Dsonar.organization=dboeckli \
-                -Dsonar.projectKey=dispatch \
+                -Dsonar.projectKey=dboeckli_dispatch \
                 -Dsonar.branch.name=${BRANCH_NAME} \
                 -Dsonar.branch.target=master
         
