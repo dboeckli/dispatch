@@ -161,7 +161,6 @@ jobs:
             mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
           fi
           mvn -B sonar:sonar \
-                -P 'coverage' \
                 -s $GITHUB_WORKSPACE/settings.xml \
                 -Dsonar.host.url=https://sonarcloud.io \
                 -Dsonar.sourceEncoding=UTF-8 \
