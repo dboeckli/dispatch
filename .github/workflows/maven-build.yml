@@ -140,3 +140,24 @@ jobs:
           files: |
             ./target/surefire-reports/TEST-*.xml
             ./target/failsafe-reports/TEST-*.xml
+            
+      - name: analyze
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+          BRANCH_MVN_VERSION: ${{needs.setup.outputs.BRANCH_MVN_VERSION}}
+          BRANCH_NAME: ${{needs.setup.outputs.BRANCH_NAME}}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+        run: |
+          set -o pipefail    # don't hide errors within pipes
+          set -o nounset     # abort on unbound variable
+          set -o errexit     # abort on nonzero exit status
+          
+          if [[ "${BRANCH_NAME}" == "master" ||  "${BRANCH_NAME}" == "main" ]]; then
+            echo "::notice:: ### Build of Master. Version: $BRANCH_MVN_VERSION"
+          else
+            echo "::notice:: ### Build of Feature Branch ${BRANCH_NAME}. Version: $BRANCH_MVN_VERSION"
+            mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
+          fi
+          mvn sonar:sonar -Pcoverage          
