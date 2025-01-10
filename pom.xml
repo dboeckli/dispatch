@@ -383,7 +383,7 @@
                             <formats>
                                 <format>XML</format>
                             </formats>
-                            <outputDirectory>target/site/jacoco/jacoco.xml</outputDirectory> <!-- default -->
+                            <outputDirectory>target/site/jacoco</outputDirectory> <!-- default -->
                         </configuration>
                     </execution>
                 </executions>
