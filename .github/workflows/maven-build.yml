@@ -157,6 +157,7 @@ jobs:
           set -o errexit     # abort on nonzero exit status
           
           if [[ "${BRANCH_NAME}" == "master" ||  "${BRANCH_NAME}" == "main" ]]; then
+            mvn -B -e clean install -s $GITHUB_WORKSPACE/settings.xml
             mvn -B sonar:sonar \
                   -s $GITHUB_WORKSPACE/settings.xml \
                   -Dsonar.token=${SONAR_TOKEN} \
@@ -167,6 +168,7 @@ jobs:
                   -Dsonar.branch.name=master
           else
             mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
+            mvn -B -e clean install -s $GITHUB_WORKSPACE/settings.xml
             mvn -B sonar:sonar \
                   -s $GITHUB_WORKSPACE/settings.xml \
                   -Dsonar.token=${SONAR_TOKEN} \
