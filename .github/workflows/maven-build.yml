@@ -160,4 +160,13 @@ jobs:
             echo "::notice:: ### Build of Feature Branch ${BRANCH_NAME}. Version: $BRANCH_MVN_VERSION"
             mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
           fi
-          mvn sonar:sonar -Pcoverage          
+          mvn -B sonar:sonar \
+                -P 'coverage' \
+                -s $GITHUB_WORKSPACE/settings.xml \
+                -Dsonar.host.url=https://sonarcloud.io \
+                -Dsonar.sourceEncoding=UTF-8 \
+                -Dsonar.organization=dboeckli \
+                -Dsonar.projectKey=dispatch \
+                -Dsonar.branch.name=${BRANCH_NAME} \
+                -Dsonar.branch.target=master
+        
