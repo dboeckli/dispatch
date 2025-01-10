@@ -396,7 +396,10 @@
                             <goal>report</goal>
                         </goals>
                         <configuration>
-                            <outputDirectory>target/jacoco-reports</outputDirectory>
+                            <formats>
+                                <format>XML</format>
+                            </formats>
+                            <outputDirectory>target/site/jacoco/jacoco.xml</outputDirectory> <!-- default -->
                         </configuration>
                     </execution>
                 </executions>
