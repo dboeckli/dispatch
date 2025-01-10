@@ -145,6 +145,7 @@ jobs:
         env:
           GITHUB_ACTOR: ${{ github.actor }}
           GITHUB_TOKEN: ${{ github.token }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           BRANCH_MVN_VERSION: ${{needs.setup.outputs.BRANCH_MVN_VERSION}}
           BRANCH_NAME: ${{needs.setup.outputs.BRANCH_NAME}}
           DOCKER_USER: ${{ secrets.DOCKER_USER }}
@@ -162,6 +163,7 @@ jobs:
           fi
           mvn -B sonar:sonar \
                 -s $GITHUB_WORKSPACE/settings.xml \
+                -Dsonar.token=${SONAR_TOKEN} \
                 -Dsonar.host.url=https://sonarcloud.io \
                 -Dsonar.sourceEncoding=UTF-8 \
                 -Dsonar.organization=dboeckli \
