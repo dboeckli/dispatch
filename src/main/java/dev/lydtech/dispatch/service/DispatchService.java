@@ -24,22 +24,22 @@ public class DispatchService {
 
     private final KafkaTemplate<String, Object> kafkaProducer;
 
-    public void process(OrderCreated orderCreated) throws Exception {
-        log.info("### Received OrderCreated Event: {}", orderCreated);
+    public void process(String key, OrderCreated orderCreated) throws Exception {
+        log.info("### Received OrderCreated Event: {} with key {}", orderCreated, key);
 
         DispatchPreparing dispatchPreparing = DispatchPreparing.builder()
             .orderId(orderCreated.getOrderId())
             .build();
-        kafkaProducer.send(DISPATCH_TRACKING_TOPIC, dispatchPreparing).get();
-        log.info("### dispatch tracking message for order {} has been sent: {}", dispatchPreparing.getOrderId(), dispatchPreparing);
+        kafkaProducer.send(DISPATCH_TRACKING_TOPIC, key, dispatchPreparing).get();
+        log.info("### dispatch tracking message for order {} has been sent: {} with key {}", dispatchPreparing.getOrderId(), dispatchPreparing, key);
         
         OrderDispatched orderDispatched = OrderDispatched.builder()
             .orderId(orderCreated.getOrderId())
             .processedById(APPLICATION_ID)
             .notes("Dispatched: " + orderCreated.getItem())
             .build();
-        kafkaProducer.send(ORDER_DISPATCHED_TOPIC, orderDispatched).get();
-        log.info("### order dispatch message for order {} has been sent: {}", orderDispatched.getOrderId(), orderDispatched);
+        kafkaProducer.send(ORDER_DISPATCHED_TOPIC, key, orderDispatched).get();
+        log.info("### order dispatch message for order {} has been sent: {} with key {}", orderDispatched.getOrderId(), orderDispatched, key);
     }
 
 }

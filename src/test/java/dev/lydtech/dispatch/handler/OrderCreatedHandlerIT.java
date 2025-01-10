@@ -28,6 +28,7 @@ import java.util.UUID;
 import static dev.lydtech.dispatch.handler.OrderCreatedHandler.ORDER_CREATED_TOPIC;
 import static dev.lydtech.dispatch.service.DispatchService.DISPATCH_TRACKING_TOPIC;
 import static dev.lydtech.dispatch.service.DispatchService.ORDER_DISPATCHED_TOPIC;
+import static java.util.UUID.randomUUID;
 import static org.junit.jupiter.api.Assertions.*;
 
 @SpringBootTest
@@ -80,13 +81,14 @@ public class OrderCreatedHandlerIT {
     
     @Test
     public void testOrderCreatedHandler() {
+        String givenKey = randomUUID().toString();
         OrderCreated givenOrderCreated = OrderCreated.builder()
             .orderId(UUID.randomUUID())
             .item("test-item")
             .build();
 
         assertDoesNotThrow(() -> {
-            kafkaTemplate.send(ORDER_CREATED_TOPIC, givenOrderCreated).get();
+            kafkaTemplate.send(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated).get();
         });
         log.info("Sent order: {}", givenOrderCreated);
 

@@ -361,19 +361,6 @@
             </plugin>
 
             <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-failsafe-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>integration-test</goal>
-                            <goal>verify</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.jacoco</groupId>
                 <artifactId>jacoco-maven-plugin</artifactId>
                 <version>${jacoco.version}</version>
@@ -396,8 +383,41 @@
                             <formats>
                                 <format>XML</format>
                             </formats>
-                            <outputDirectory>target/site/jacoco/jacoco.xml</outputDirectory> <!-- default -->
+                            <outputDirectory>target/site/jacoco</outputDirectory> <!-- default -->
                         </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <argLine>${argLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                        </configuration>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-failsafe-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <configuration>
+                            <!--suppress UnresolvedMavenProperty -->
+                            <argLine>${argLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
+                        </configuration>
+                        <goals>
+                            <goal>integration-test</goal>
+                            <goal>verify</goal>
+                        </goals>
                     </execution>
                 </executions>
             </plugin>
