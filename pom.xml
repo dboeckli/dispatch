@@ -33,6 +33,7 @@
 
         <github.acions.build>false</github.acions.build>
         <skip.docker.publish>true</skip.docker.publish>
+        <skip.start.stop.springboot>false</skip.start.stop.springboot>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
@@ -275,6 +276,7 @@
                             <goal>stop</goal>
                         </goals>
                         <configuration>
+                            <skip>${skip.start.stop.springboot}</skip>
                             <wait>1000</wait> <!-- 1000 milliseconds is default -->
                             <maxAttempts>120</maxAttempts> <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 60 seconds. -->
                             <profiles>docker</profiles>
