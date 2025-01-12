@@ -169,11 +169,24 @@ jobs:
           server-id: github # Value of the distributionManagement/repository/id field of the pom.xml.
           settings-path: ${{ github.workspace }} # location for the settings.xml file  
 
-      - name: Restore cache
-        uses: actions/cache@v4
-        with:
-          path: ./target
-          key: ${{ runner.os }}-cache-${{ github.sha }}
+      - name: verify
+        env:
+          GITHUB_ACTOR: ${{ github.actor }}
+          GITHUB_TOKEN: ${{ github.token }}
+          SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+          BRANCH_MVN_VERSION: ${{needs.setup.outputs.BRANCH_MVN_VERSION}}
+          BRANCH_NAME: ${{needs.setup.outputs.BRANCH_NAME}}
+          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
+          ORGANIZATION: ${{needs.setup.outputs.ORGANIZATION}}
+          ARTIFACT_ID: ${{needs.setup.outputs.ARTIFACT_ID}}
+        run: |
+          if [[ "${BRANCH_NAME}" == "master" ||  "${BRANCH_NAME}" == "main" ]]; then
+            mvn -B clean verify -e -s $GITHUB_WORKSPACE/settings.xml
+          else
+            mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
+            mvn -B clean verify -e -s $GITHUB_WORKSPACE/settings.xml
+          fi
           
       - name: List Test Report Files
         if: always()
