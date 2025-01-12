@@ -15,20 +15,23 @@
     <name>${project.artifactId}</name>
     <description>${project.artifactId}</description>
 
+    <organization>
+        <name>dboeckli</name>
+    </organization>
+
     <scm>
-        <connection>scm:git:https://github.com/${organization.name}/${project.artifactId}.git</connection>
-        <developerConnection>scm:git:https://github.com/${organization.name}/${project.artifactId}.git</developerConnection>
-        <url>https://github.com/${organization.name}/${project.artifactId}.git</url>
+        <connection>scm:git:https://github.com/${project.organization.name}/${project.artifactId}.git</connection>
+        <developerConnection>scm:git:https://github.com/${project.organization.name}/${project.artifactId}.git</developerConnection>
+        <url>https://github.com/${project.organization.name}/${project.artifactId}.git</url>
         <tag>HEAD</tag>
     </scm>
 
     <properties>
         <java.version>21</java.version>
 
-        <organization.name>dboeckli</organization.name>
-
         <github.acions.build>false</github.acions.build>
         <skip.docker.publish>true</skip.docker.publish>
+        <skip.start.stop.springboot>false</skip.start.stop.springboot>
 
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <maven.compiler.source>21</maven.compiler.source>
@@ -60,7 +63,7 @@
             Configure maven settings of IntelliJ to use your personal settings.xml
             -->
             <id>github</id>
-            <url>https://maven.pkg.github.com/${organization.name}/${project.artifactId}</url>
+            <url>https://maven.pkg.github.com/${project.organization.name}/${project.artifactId}</url>
             <snapshots>
                 <enabled>true</enabled>
             </snapshots>
@@ -88,7 +91,7 @@
         <repository>
             <id>github</id>
             <name>GitHub dboeckli Apache Maven Packages</name>
-            <url>https://maven.pkg.github.com/${organization.name}/${project.artifactId}</url>
+            <url>https://maven.pkg.github.com/${project.organization.name}/${project.artifactId}</url>
         </repository>
     </distributionManagement>
 
@@ -271,6 +274,7 @@
                             <goal>stop</goal>
                         </goals>
                         <configuration>
+                            <skip>${skip.start.stop.springboot}</skip>
                             <wait>1000</wait> <!-- 1000 milliseconds is default -->
                             <maxAttempts>120</maxAttempts> <!-- 30 attempts is default, combined with wait it results to 30 sec. We wait 60 seconds. -->
                             <profiles>docker</profiles>
@@ -309,9 +313,9 @@
                         <configuration>
                             <skip>${skip.docker.publish}</skip>
                             <image>
-                                <name>ghcr.io/${organization.name}/${project.artifactId}:latest</name>
+                                <name>ghcr.io/${project.organization.name}/${project.artifactId}:latest</name>
                                 <tags>
-                                    ghcr.io/${organization.name}/${project.artifactId}:${project.version}
+                                    ghcr.io/${project.organization.name}/${project.artifactId}:${project.version}
                                 </tags>
                                 <publish>true</publish>
                             </image>
@@ -395,7 +399,7 @@
                 <executions>
                     <execution>
                         <configuration>
-                            <!--suppress UnresolvedMavenProperty -->
+                            <!--suppress UnresolvedMavenProperty. argline is set by jacoco -->
                             <argLine>${argLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
                         </configuration>
                         <goals>
@@ -411,7 +415,7 @@
                 <executions>
                     <execution>
                         <configuration>
-                            <!--suppress UnresolvedMavenProperty -->
+                            <!--suppress UnresolvedMavenProperty. argline is set by jacoco -->
                             <argLine>${argLine} -XX:+EnableDynamicAgentLoading -Xshare:off</argLine>
                         </configuration>
                         <goals>

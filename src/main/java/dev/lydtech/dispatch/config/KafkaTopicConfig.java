@@ -29,7 +29,7 @@ public class KafkaTopicConfig {
     @Bean
     public List<NewTopic> topics() {
         List<NewTopic> topics = new ArrayList<>();
-        topics.add(new NewTopic(ORDER_CREATED_TOPIC, 1, (short) 1)
+        topics.add(new NewTopic(ORDER_CREATED_TOPIC, 5, (short) 1)
             .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))));
         topics.add(new NewTopic(ORDER_DISPATCHED_TOPIC, 1, (short) 1)
             .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))));

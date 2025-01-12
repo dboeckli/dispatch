@@ -1,7 +1,7 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="DispatchApplication with Docker" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="docker" />
-    <module name="dispatch" />
+    <module name="spring-6-project-template" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="dev.lydtech.dispatch.DispatchApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
