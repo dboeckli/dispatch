@@ -195,9 +195,9 @@ jobs:
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
-          report_individual_runs: true
           files: |
-            target/failsafe-reports/TEST-*.xml  
+            ./target/surefire-reports/TEST-*.xml
+            ./target/failsafe-reports/TEST-*.xml  
 
       - name: analyze
         env:
