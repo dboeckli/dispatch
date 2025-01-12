@@ -25,6 +25,7 @@ jobs:
       MVN_VERSION: ${{ steps.set_version.outputs.MVN_VERSION }}
       ARTIFACT_ID: ${{ steps.set_version.outputs.ARTIFACT_ID }}
       GROUP_ID: ${{ steps.set_version.outputs.GROUP_ID }}
+      ORGANIZATION: ${{ steps.set_version.outputs.ORGANIZATION }}
 
     steps:
       - uses: actions/checkout@v4
@@ -59,6 +60,7 @@ jobs:
           echo "### ALLMYVARS: $ALLMYVARS"
           echo "### ALLMYOUTPUT: $ALLMYOUTPUT"
           echo ":sunflower: Cleaned Branch Name: ${{ steps.set_version.outputs.BRANCH_NAME }}" >> $GITHUB_STEP_SUMMARY
+          echo ":maple_leaf: ORGANIZATION: ${{ steps.set_version.outputs.ORGANIZATION }}" >> $GITHUB_STEP_SUMMARY
           echo ":maple_leaf: GROUP ID: ${{ steps.set_version.outputs.GROUP_ID }}" >> $GITHUB_STEP_SUMMARY
           echo ":maple_leaf: Artifact ID: ${{ steps.set_version.outputs.ARTIFACT_ID }}" >> $GITHUB_STEP_SUMMARY
           echo ":maple_leaf: Original Maven version: ${{ steps.set_version.outputs.MVN_VERSION }}" >> $GITHUB_STEP_SUMMARY
