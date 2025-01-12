@@ -178,14 +178,23 @@ jobs:
         run: |
           echo "showing restore cache with tree"
           tree
+          
+      - name: List Test Report Files
+        if: always()
+        run: |
+          echo "Surefire Reports:"
+          ls -l target/surefire-reports/TEST-*.xml || echo "No Surefire XML reports found"
+          
+          echo "Failsafe Reports:"
+          ls -l target/failsafe-reports/TEST-*.xml || echo "No Failsafe XML reports found"    
 
       - name: Publish Test Results
         uses: EnricoMi/publish-unit-test-result-action@v2
         if: always()
         with:
           files: |
-            ./target/surefire-reports/TEST-*.xml
-            ./target/failsafe-reports/TEST-*.xml   
+            target/surefire-reports/TEST-*.xml
+            target/failsafe-reports/TEST-*.xml   
 
       - name: analyze
         env:
