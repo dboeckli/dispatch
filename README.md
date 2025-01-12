@@ -38,3 +38,9 @@ bin/kafka-console-producer.sh --bootstrap-server localhost:29092 --topic order.c
 >{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"} 
 ```
 
+Send message with key
+```
+bin/kafka-console-producer.sh --bootstrap-server localhost:29092 --topic order.created --property parse.key=true --property key.separator=:
+>"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}
+```
+
