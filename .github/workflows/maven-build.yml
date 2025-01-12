@@ -134,6 +134,15 @@ jobs:
             mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
           fi
           mvn -B -e deploy -s $GITHUB_WORKSPACE/settings.xml
+          
+      - name: Publish Test Results
+        uses: EnricoMi/publish-unit-test-result-action@v2
+        if: always()
+        with:
+          large_files: true
+          files: |
+            ./target/surefire-reports/TEST-*.xml
+            ./target/failsafe-reports/TEST-*.xml       
   
   analyze:
     runs-on: ubuntu-latest
@@ -192,15 +201,6 @@ jobs:
           
           echo "Failsafe Reports:"
           ls -l target/failsafe-reports/TEST-*.xml || echo "No Failsafe XML reports found"    
-
-      - name: Publish Test Results
-        uses: EnricoMi/publish-unit-test-result-action@v2
-        if: always()
-        with:
-          large_files: true
-          files: |
-            ./target/surefire-reports/TEST-*.xml
-            ./target/failsafe-reports/TEST-*.xml  
 
       - name: analyze
         env:
