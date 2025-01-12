@@ -134,14 +134,6 @@ jobs:
             mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
           fi
           mvn -B -e deploy -s $GITHUB_WORKSPACE/settings.xml
-
-      - name: Cache produced build target
-        uses: actions/cache@v4
-        with:
-          path: ./target
-          key: ${{ runner.os }}-cache-${{ github.sha }}
-  
-  
   
   analyze:
     runs-on: ubuntu-latest
