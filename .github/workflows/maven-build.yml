@@ -229,8 +229,8 @@ jobs:
                   -Dsonar.token=${SONAR_TOKEN} \
                   -Dsonar.host.url=https://sonarcloud.io \
                   -Dsonar.sourceEncoding=UTF-8 \
-                  -Dsonar.organization=dboeckli \
-                  -Dsonar.projectKey=dboeckli_dispatch \
+                  -Dsonar.organization=${ORGANIZATION} \
+                  -Dsonar.projectKey="${ORGANIZATION}_${ARTIFACT_ID}" \
                   -Dsonar.branch.name=master
           else
             mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
@@ -239,8 +239,8 @@ jobs:
                   -Dsonar.token=${SONAR_TOKEN} \
                   -Dsonar.host.url=https://sonarcloud.io \
                   -Dsonar.sourceEncoding=UTF-8 \
-                  -Dsonar.organization=dboeckli \
-                  -Dsonar.projectKey=dboeckli_dispatch \
+                  -Dsonar.organization=${ORGANIZATION} \
+                  -Dsonar.projectKey="${ORGANIZATION}_${ARTIFACT_ID}" \
                   -Dsonar.branch.name=${BRANCH_NAME} \
                   -Dsonar.branch.target=master
           fi
