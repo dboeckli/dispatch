@@ -175,14 +175,11 @@ jobs:
           path: ./target
           key: ${{ runner.os }}-cache-${{ github.sha }}
           
-      - name: Read cached data
-        run: |
-          echo "showing restore cache with tree"
-          tree
-          
       - name: List Test Report Files
         if: always()
         run: |
+          echo "showing restore cache with tree"
+          tree
           echo "Surefire Reports:"
           ls -l target/surefire-reports/TEST-*.xml || echo "No Surefire XML reports found"
           
@@ -195,7 +192,7 @@ jobs:
         with:
           report_individual_runs: true
           files: |
-            **/TEST-*.xml  
+            target/failsafe-reports/TEST-*.xml  
 
       - name: analyze
         env:
