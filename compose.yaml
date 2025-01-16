@@ -30,6 +30,18 @@ services:
     #volumes:
       # Diese Zeile definiert ein Volume-Mapping. Es verbindet das ./kafka-data-Verzeichnis auf dem Host-System mit dem /var/lib/kafka/data-Verzeichnis im Kafka-Container.
       #- kafka_data:/var/lib/kafka/data  # Store Kafka logs on your local machine.  
+  
+  wiremock:
+    image: wiremock/wiremock:3.10.0
+    container_name: wiremock
+    ports:
+      - "8888:8080"
+    expose:
+      - 8888
+    command: --global-response-templating --disable-gzip --verbose
+    volumes:
+      - ./wiremock/mappings:/home/wiremock/mappings
+
   tracking-service:
     container_name: tracking-service
     image: domboeckli/tracking:0.0.1-SNAPSHOT

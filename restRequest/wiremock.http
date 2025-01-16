@@ -1,0 +1,19 @@
+### wiremock 200
+GET http://localhost:8888/api/stock
+Accept: application/json
+
+### wiremock stock api (400 response)
+GET http://localhost:8888/api/stock?item=test_400
+Accept: application/json
+
+### wiremock stock api (500 response)
+GET http://localhost:8888/api/stock?item=test_500
+Accept: application/json
+
+### wiremock transient 502 - First request (should return 502)
+GET http://localhost:8888/api/stock?item=test_502
+Accept: application/json
+
+### wiremock transient 502 - Second request (should return 200)
+GET http://localhost:8888/api/stock?item=test_502
+Accept: application/json
