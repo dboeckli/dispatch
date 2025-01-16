@@ -1,5 +1,6 @@
 package dev.lydtech.dispatch.handler;
 
+import dev.lydtech.dispatch.message.DispatchCompleted;
 import dev.lydtech.dispatch.message.DispatchPreparing;
 import dev.lydtech.dispatch.message.OrderCreated;
 import dev.lydtech.dispatch.message.OrderDispatched;
@@ -10,6 +11,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.TestConfiguration;
 import org.springframework.context.annotation.Bean;
+import org.springframework.kafka.annotation.KafkaHandler;
 import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.kafka.config.KafkaListenerEndpointRegistry;
 import org.springframework.kafka.core.KafkaTemplate;
@@ -63,12 +65,14 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
 
     }
 
+    @KafkaListener(groupId = "KafkaIntegrationTest", topics = {DISPATCH_TRACKING_TOPIC, ORDER_DISPATCHED_TOPIC})
     protected static class KafkaTestListener {
         AtomicInteger dispatchPreparingCounter = new AtomicInteger(0);
         AtomicInteger orderDispatchedCounter = new AtomicInteger(0);
+        AtomicInteger dispatchCompletedCounter = new AtomicInteger(0);
 
-        @KafkaListener(groupId = "KafkaIntegrationTest", topics = DISPATCH_TRACKING_TOPIC)
-        void receiveDispatchPreparing(@Header(KafkaHeaders.RECEIVED_KEY) String key, 
+        @KafkaHandler
+        void receiveDispatchPreparing(@Header(KafkaHeaders.RECEIVED_KEY) String key,
                                       @Payload DispatchPreparing payload) {
             log.info("Received DispatchPreparing with key {} and payload: {}", key, payload);
             assertNotNull(key);
@@ -76,13 +80,22 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
             dispatchPreparingCounter.incrementAndGet();
         }
 
-        @KafkaListener(groupId = "KafkaIntegrationTest", topics = ORDER_DISPATCHED_TOPIC)
-        void receiveOrderDispatched(@Header(KafkaHeaders.RECEIVED_KEY) String key, 
+        @KafkaHandler
+        void receiveOrderDispatched(@Header(KafkaHeaders.RECEIVED_KEY) String key,
                                     @Payload OrderDispatched payload) {
             log.info("Received DispatchPreparing with key {} and payload: {}", key, payload);
             assertNotNull(key);
             assertNotNull(payload);
             orderDispatchedCounter.incrementAndGet();
+        }
+
+        @KafkaHandler
+        void receiveDispatchCompleted(@Header(KafkaHeaders.RECEIVED_KEY) String key,
+                                      @Payload DispatchCompleted payload) {
+            log.info("Received DispatchCompleted with key {} and payload: {}", key, payload);
+            assertNotNull(key);
+            assertNotNull(payload);
+            dispatchCompletedCounter.incrementAndGet();
         }
     }
 
@@ -90,12 +103,14 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
     public void setUp() {
         testListener.dispatchPreparingCounter.set(0);
         testListener.orderDispatchedCounter.set(0);
+        testListener.dispatchCompletedCounter.set(0);
 
         // Wait until the partitions are assigned.
         registry.getListenerContainers().forEach(container ->
-            ContainerTestUtils.waitForAssignment(container, embeddedKafkaBroker.getPartitionsPerTopic()));
+            ContainerTestUtils.waitForAssignment(container,
+                container.getContainerProperties().getTopics().length * embeddedKafkaBroker.getPartitionsPerTopic()));
     }
-    
+
     @Test
     public void testOrderCreatedHandler() throws Exception {
         String givenKey = randomUUID().toString();
@@ -103,21 +118,23 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
             .orderId(UUID.randomUUID())
             .item("test-item")
             .build();
-        
+
         sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
 
         await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.dispatchPreparingCounter::get, equalTo(1));
         await().atMost(1, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.orderDispatchedCounter::get, equalTo(1));
+        await().atMost(1, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+            .until(testListener.dispatchCompletedCounter::get, equalTo(1));
     }
 
     private void sendMessage(String topic, String key, Object payload) throws Exception {
         kafkaTemplate.send(MessageBuilder
             .withPayload(payload)
-                .setHeader(KafkaHeaders.KEY, key)
+            .setHeader(KafkaHeaders.KEY, key)
             .setHeader(KafkaHeaders.TOPIC, topic)
             .build()).get();
     }
-    
+
 }
