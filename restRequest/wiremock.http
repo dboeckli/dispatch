@@ -1,4 +1,4 @@
-### wiremock 200
+### wiremock stock api (200 response)
 GET http://localhost:8888/api/stock
 Accept: application/json
 
