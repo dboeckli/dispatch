@@ -140,12 +140,24 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
 
         // Wait until the partitions are assigned.
         registry.getListenerContainers().forEach(container -> {
-            Map<String, Collection<TopicPartition>> assignments =  container.getAssignmentsByClientId();
-            int totalPartitions = assignments.values().stream()
+
+            await().atMost(30, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS)
+                .until(() -> {
+                    Map<String, Collection<TopicPartition>> assignments = container.getAssignmentsByClientId();
+                    int totalPartitions = assignments.values().stream()
+                        .mapToInt(Collection::size)
+                        .sum();
+                    log.info("Current total assigned partitions: {}", totalPartitions);
+                    return totalPartitions >= embeddedKafkaBroker.getPartitionsPerTopic();
+                });
+
+            Map<String, Collection<TopicPartition>> finalAssignments = container.getAssignmentsByClientId();
+            int finalTotalPartitions = finalAssignments.values().stream()
                 .mapToInt(Collection::size)
                 .sum();
-            log.info("Total assigned partitions: {}", totalPartitions);
-            ContainerTestUtils.waitForAssignment(container, totalPartitions);
+            log.info("Final total assigned partitions: {}", finalTotalPartitions);
+            ContainerTestUtils.waitForAssignment(container, finalTotalPartitions);
         });
     }
     
@@ -247,6 +259,7 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
 
     @Test
     public void testOrderDispatchFlow_RetryUntilFailure() throws Exception {
+        log.info("### testOrderDispatchFlow_RetryUntilFailure");
         stubFor(get(urlPathMatching("/api/stock.*"))
             .willReturn(aResponse()
                 .withStatus(503) // Service unavailable, should be retried
