@@ -1,5 +1,7 @@
 package dev.lydtech.dispatch.handler;
 
+import dev.lydtech.dispatch.error.NotRetryableException;
+import dev.lydtech.dispatch.error.RetryableException;
 import dev.lydtech.dispatch.message.OrderCreated;
 import dev.lydtech.dispatch.service.DispatchService;
 import lombok.RequiredArgsConstructor;
@@ -30,8 +32,12 @@ public class OrderCreatedHandler {
         log.info("### Received message: Partition: {}, Key: {}, Payload: {}", partition, key, orderCreated);
         try {
             dispatchService.process(key, orderCreated);
+        } catch (RetryableException e) {
+            log.warn("Retryable Exception for {}. Reason was: {}", orderCreated, e.getMessage());
+            throw e;
         } catch (Exception e) {
-            log.error("Error processing payload {}", orderCreated, e);
-        }
+            log.error("Not Retryable for {}", orderCreated, e);
+            throw new NotRetryableException(e);
+        } 
     }
 }
