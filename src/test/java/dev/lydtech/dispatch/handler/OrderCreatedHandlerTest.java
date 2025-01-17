@@ -1,11 +1,14 @@
 package dev.lydtech.dispatch.handler;
 
+import dev.lydtech.dispatch.error.NotRetryableException;
 import dev.lydtech.dispatch.message.OrderCreated;
 import dev.lydtech.dispatch.service.DispatchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import static java.util.UUID.randomUUID;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.mockito.Mockito.*;
 
 class OrderCreatedHandlerTest {
@@ -43,8 +46,9 @@ class OrderCreatedHandlerTest {
 
         doThrow(new RuntimeException("Service failure")).when(dispatchServiceMock).process(givenKey, orderCreated);
 
-        handler.listen(givenPartition, givenKey, orderCreated);
-
+        NotRetryableException exception = assertThrows(NotRetryableException.class, () -> handler.listen(givenPartition, givenKey, orderCreated));
+        assertEquals("java.lang.RuntimeException: Service failure", exception.getMessage());
+        
         verify(dispatchServiceMock, times(1)).process(givenKey, orderCreated);
     }
 

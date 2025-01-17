@@ -39,6 +39,8 @@
 
         <logbook.version>3.10.0</logbook.version>
         <logstash-logback.version>8.0</logstash-logback.version>
+        
+        <wiremock.version>3.4.0</wiremock.version>
 
         <!-- Sonar -->
         <sonar.java.coveragePlugin>jacoco</sonar.java.coveragePlugin>
@@ -158,11 +160,20 @@
             <artifactId>spring-kafka-test</artifactId>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <groupId>org.wiremock.integrations</groupId>
+            <artifactId>wiremock-spring-boot</artifactId>
+            <version>${wiremock.version}</version>
+            <scope>test</scope>
+        </dependency>
+
         <dependency>
             <groupId>org.awaitility</groupId>
             <artifactId>awaitility</artifactId>
             <scope>test</scope>
         </dependency>
+
     </dependencies>
 
     <build>
