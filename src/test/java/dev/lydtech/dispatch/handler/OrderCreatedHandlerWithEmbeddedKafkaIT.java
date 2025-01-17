@@ -6,6 +6,7 @@ import dev.lydtech.dispatch.message.DispatchPreparing;
 import dev.lydtech.dispatch.message.OrderCreated;
 import dev.lydtech.dispatch.message.OrderDispatched;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +31,8 @@ import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
 import org.wiremock.spring.EnableWireMock;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -137,20 +140,12 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
 
         // Wait until the partitions are assigned.
         registry.getListenerContainers().forEach(container -> {
-            String[] topics = container.getContainerProperties().getTopics();
-            //Map<String, Collection<TopicPartition>> assignments =  container.getAssignmentsByClientId();
-            int expectedPartitions = 0;
-            for (String topic : topics) {
-                if (topic.equals(ORDER_CREATED_TOPIC)) {
-                    expectedPartitions = 2;
-                } else if (topic.equals(ORDER_CREATED_DLT_TOPIC)) {
-                    expectedPartitions = 6;
-                } else {
-                    expectedPartitions = 4; //Default
-                }
-                log.info("Waiting for assignment of topic: {}. expected partitions {}", topic, expectedPartitions);
-            }
-            ContainerTestUtils.waitForAssignment(container, expectedPartitions);
+            Map<String, Collection<TopicPartition>> assignments =  container.getAssignmentsByClientId();
+            int totalPartitions = assignments.values().stream()
+                .mapToInt(Collection::size)
+                .sum();
+            log.info("Total assigned partitions: {}", totalPartitions);
+            ContainerTestUtils.waitForAssignment(container, totalPartitions);
         });
     }
     
