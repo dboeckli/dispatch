@@ -36,7 +36,7 @@ public class OrderCreatedHandler {
             log.warn("Retryable Exception for {}. Reason was: {}", orderCreated, e.getMessage());
             throw e;
         } catch (Exception e) {
-            log.error("Not Retryable for {}", orderCreated, e);
+            log.error("Not Retryable Exception for {}. Message will be sent to DLQ.", orderCreated, e);
             throw new NotRetryableException(e);
         } 
     }
