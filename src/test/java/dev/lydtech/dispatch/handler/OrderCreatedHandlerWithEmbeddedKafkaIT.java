@@ -260,6 +260,8 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
 
         sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
 
+        TimeUnit.SECONDS.sleep(3);
+        
         await().atMost(5, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.orderCreatedDLTCounter::get, equalTo(1));
         
