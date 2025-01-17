@@ -6,6 +6,7 @@ import org.apache.kafka.clients.admin.*;
 import org.apache.kafka.common.config.ConfigResource;
 import org.apache.kafka.common.errors.TopicExistsException;
 import org.springframework.context.ApplicationListener;
+import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.ContextRefreshedEvent;
 import org.springframework.kafka.core.KafkaAdmin;
 import org.springframework.stereotype.Component;
@@ -18,6 +19,7 @@ import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
 @Component
+@Profile("!test-embedded-kafka")
 @RequiredArgsConstructor
 @Slf4j
 public class KafkaTopicInitializer implements ApplicationListener<ContextRefreshedEvent> {

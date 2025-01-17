@@ -6,6 +6,7 @@ import dev.lydtech.dispatch.message.DispatchPreparing;
 import dev.lydtech.dispatch.message.OrderCreated;
 import dev.lydtech.dispatch.message.OrderDispatched;
 import lombok.extern.slf4j.Slf4j;
+import org.apache.kafka.common.TopicPartition;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,9 +29,10 @@ import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.DynamicPropertyRegistry;
 import org.springframework.test.context.DynamicPropertySource;
-import org.springframework.web.client.RestTemplate;
 import org.wiremock.spring.EnableWireMock;
 
+import java.util.Collection;
+import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -60,9 +62,6 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
     private KafkaTemplate<String, Object> kafkaTemplate;
 
     @Autowired
-    RestTemplate restTemplate;
-
-    @Autowired
     private EmbeddedKafkaBroker embeddedKafkaBroker;
 
     @Autowired
@@ -70,6 +69,8 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
 
     @Autowired
     private KafkaTestListener testListener;
+    
+    private final static String ORDER_CREATED_DLT_TOPIC = ORDER_CREATED_TOPIC + "-dlt";
 
     @TestConfiguration
     static class TestConfig {
@@ -84,11 +85,12 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
         registry.add("dispatch.stockServiceEndpoint", () -> "${wiremock.server.baseUrl}/api/stock");
     }
 
-    @KafkaListener(groupId = "KafkaIntegrationTest", topics = {DISPATCH_TRACKING_TOPIC, ORDER_DISPATCHED_TOPIC})
+    @KafkaListener(groupId = "KafkaIntegrationTest", topics = {DISPATCH_TRACKING_TOPIC, ORDER_DISPATCHED_TOPIC, ORDER_CREATED_DLT_TOPIC})
     protected static class KafkaTestListener {
         AtomicInteger dispatchPreparingCounter = new AtomicInteger(0);
         AtomicInteger orderDispatchedCounter = new AtomicInteger(0);
         AtomicInteger dispatchCompletedCounter = new AtomicInteger(0);
+        AtomicInteger orderCreatedDLTCounter = new AtomicInteger(0);
 
         @KafkaHandler
         void receiveDispatchPreparing(@Header(KafkaHeaders.RECEIVED_KEY) String key,
@@ -116,6 +118,15 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
             assertNotNull(payload);
             dispatchCompletedCounter.incrementAndGet();
         }
+
+        @KafkaHandler
+        void receiveOrderCreatedDLT(@Header(KafkaHeaders.RECEIVED_KEY) String key,
+                                    @Payload OrderCreated payload) {
+            log.info("Dead Letter Message Received: OrderCreated with key {} and payload: {}", key, payload);
+            assertNotNull(key);
+            assertNotNull(payload);
+            orderCreatedDLTCounter.incrementAndGet();
+        }
     }
 
     @BeforeEach
@@ -125,17 +136,28 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
         testListener.dispatchPreparingCounter.set(0);
         testListener.orderDispatchedCounter.set(0);
         testListener.dispatchCompletedCounter.set(0);
+        testListener.orderCreatedDLTCounter.set(0);
 
         // Wait until the partitions are assigned.
         registry.getListenerContainers().forEach(container -> {
-            String[] topics = container.getContainerProperties().getTopics();
-            //Map<String, Collection<TopicPartition>> assignments =  container.getAssignmentsByClientId();
-            int expectedPartitions = 0;
-            for (String topic : topics) {
-                expectedPartitions = (topic.equals(ORDER_CREATED_TOPIC) ? 2 : 4);
-                log.info("Waiting for assignment of topic: {}. expected partitions {}", topic, expectedPartitions);
-            }
-            ContainerTestUtils.waitForAssignment(container, expectedPartitions);
+
+            await().atMost(30, TimeUnit.SECONDS)
+                .pollInterval(100, TimeUnit.MILLISECONDS)
+                .until(() -> {
+                    Map<String, Collection<TopicPartition>> assignments = container.getAssignmentsByClientId();
+                    int totalPartitions = assignments.values().stream()
+                        .mapToInt(Collection::size)
+                        .sum();
+                    log.info("Current total assigned partitions: {}", totalPartitions);
+                    return totalPartitions >= embeddedKafkaBroker.getPartitionsPerTopic();
+                });
+
+            Map<String, Collection<TopicPartition>> finalAssignments = container.getAssignmentsByClientId();
+            int finalTotalPartitions = finalAssignments.values().stream()
+                .mapToInt(Collection::size)
+                .sum();
+            log.info("Final total assigned partitions: {}", finalTotalPartitions);
+            ContainerTestUtils.waitForAssignment(container, finalTotalPartitions);
         });
     }
     
@@ -163,6 +185,9 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
             .until(testListener.orderDispatchedCounter::get, equalTo(1));
         await().atMost(1, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.dispatchCompletedCounter::get, equalTo(1));
+
+        assertThat(testListener.orderCreatedDLTCounter.get(), equalTo(0));
+
     }
 
     @Test
@@ -181,6 +206,9 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
         sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
 
         TimeUnit.SECONDS.sleep(3);
+
+        await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+            .until(testListener.orderCreatedDLTCounter::get, equalTo(1));
         
         assertThat(testListener.dispatchPreparingCounter.get(), equalTo(0));
         assertThat(testListener.orderDispatchedCounter.get(), equalTo(0));
@@ -226,6 +254,33 @@ public class OrderCreatedHandlerWithEmbeddedKafkaIT {
             .until(testListener.orderDispatchedCounter::get, equalTo(1));
         await().atMost(1, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.dispatchCompletedCounter::get, equalTo(1));
+        assertThat(testListener.orderCreatedDLTCounter.get(), equalTo(0));
+    }
+
+    @Test
+    public void testOrderDispatchFlow_RetryUntilFailure() throws Exception {
+        log.info("### testOrderDispatchFlow_RetryUntilFailure");
+        stubFor(get(urlPathMatching("/api/stock.*"))
+            .willReturn(aResponse()
+                .withStatus(503) // Service unavailable, should be retried
+            ));
+
+        String givenKey = randomUUID().toString();
+        OrderCreated givenOrderCreated = OrderCreated.builder()
+            .orderId(UUID.randomUUID())
+            .item("test-item")
+            .build();
+
+        sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
+
+        TimeUnit.SECONDS.sleep(3);
+        
+        await().atMost(5, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+            .until(testListener.orderCreatedDLTCounter::get, equalTo(1));
+        
+        assertThat(testListener.dispatchPreparingCounter.get(), equalTo(0));
+        assertThat(testListener.orderDispatchedCounter.get(), equalTo(0));
+        assertThat(testListener.dispatchCompletedCounter.get(), equalTo(0));
     }
 
     private void sendMessage(String topic, String key, Object payload) throws Exception {
