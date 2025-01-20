@@ -5,16 +5,16 @@
 
 version: 2
 registries:
-  - maven-github-dboeckli:
-      type: maven-repository
-      url: https://maven.pkg.github.com/dboeckli
-      username: dboeckli
-      token: ${{secrets.DBOECKLI_GITHUB_ACCESS_TOKEN}}
-  - github-dboeckli:
-      type: git
-      url: https://github.com
-      username: dboeckli
-      password: ${{secrets.DBOECKLI_GITHUB_ACCESS_TOKEN}}
+  maven-github-dboeckli:
+    type: maven-repository
+    url: https://maven.pkg.github.com/dboeckli
+    username: dboeckli
+    token: ${{secrets.DBOECKLI_GITHUB_ACCESS_TOKEN}}
+  github-dboeckli:
+    type: git
+    url: https://github.com
+    username: dboeckli
+    password: ${{secrets.DBOECKLI_GITHUB_ACCESS_TOKEN}}
 updates:
   - package-ecosystem: maven
     directory: "/"
