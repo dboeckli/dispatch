@@ -7,7 +7,7 @@ version: 2
 registries:
   maven-dboeckli: 
     type: maven-repository
-    url: maven.pkg.github.com/dboeckli
+    url: https://maven.pkg.github.com/dboeckli
     username: dboeckli
     password: ${{secrets.DBOECKLI_GITHUB_ACCESS_TOKEN}}  
 updates:
