@@ -2,7 +2,7 @@ package dev.lydtech.dispatch.config;
 
 import dev.lydtech.dispatch.error.NotRetryableException;
 import dev.lydtech.dispatch.error.RetryableException;
-import dev.lydtech.dispatch.message.OrderCreated;
+import dev.lydtech.message.OrderCreated;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;

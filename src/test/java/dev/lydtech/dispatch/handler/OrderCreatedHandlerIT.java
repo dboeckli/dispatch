@@ -1,9 +1,9 @@
 package dev.lydtech.dispatch.handler;
 
-import dev.lydtech.dispatch.message.DispatchCompleted;
-import dev.lydtech.dispatch.message.DispatchPreparing;
-import dev.lydtech.dispatch.message.OrderCreated;
-import dev.lydtech.dispatch.message.OrderDispatched;
+import dev.lydtech.message.DispatchCompleted;
+import dev.lydtech.message.DispatchPreparing;
+import dev.lydtech.message.OrderCreated;
+import dev.lydtech.message.OrderDispatched;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.clients.consumer.ConsumerRecord;
@@ -205,7 +205,7 @@ public class OrderCreatedHandlerIT {
         consumerProps.put(ConsumerConfig.AUTO_OFFSET_RESET_CONFIG, "earliest");
         consumerProps.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         consumerProps.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
-        consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "dev.lydtech.dispatch.message");
+        consumerProps.put(JsonDeserializer.TRUSTED_PACKAGES, "dev.lydtech.message");
         return consumerProps;
     }
 }
