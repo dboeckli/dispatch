@@ -20,8 +20,9 @@ updates:
     directory: "/"
     schedule:
       interval: daily
+    registries:
+      - maven-github-dboeckli  
     ignore:
-      # ignore Maven APIs/SPIs
       - dependency-name: org.apache.maven:*
   - package-ecosystem: "github-actions"
     directory: "/"
