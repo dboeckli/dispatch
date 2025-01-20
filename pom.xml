@@ -98,6 +98,13 @@
     </distributionManagement>
 
     <dependencies>
+        <!-- our lib projects with messages -->
+        <dependency>
+            <groupId>dev.lydtech</groupId>
+            <artifactId>dispatch-tracking-lib</artifactId>
+            <version>0.0.1</version>
+        </dependency>
+        
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
@@ -125,24 +132,6 @@
             <scope>runtime</scope>
             <optional>true</optional>
         </dependency>
-
-        <!--
-        <dependency>
-            <groupId>org.zalando</groupId>
-            <artifactId>logbook-spring-boot-starter</artifactId>
-            <version>${logbook.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.zalando</groupId>
-            <artifactId>logbook-logstash</artifactId>
-            <version>${logbook.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>net.logstash.logback</groupId>
-            <artifactId>logstash-logback-encoder</artifactId>
-            <version>${logstash-logback.version}</version>
-        </dependency>
-        -->
 
         <dependency>
             <groupId>org.projectlombok</groupId>

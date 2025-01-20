@@ -4,6 +4,16 @@
 # https://docs.github.com/code-security/dependabot/dependabot-version-updates/configuration-options-for-the-dependabot.yml-file
 
 version: 2
+registries:
+  maven-github-dboeckli:
+    type: maven-repository
+    url: https://maven.pkg.github.com/dboeckli
+    token: ${{secrets.DBOECKLI_GITHUB_ACCESS_TOKEN}}
+  github-dboeckli:
+    type: git
+    url: https://github.com
+    username: x-access-token
+    password: ${{secrets.DBOECKLI_GITHUB_ACCESS_TOKEN}}
 updates:
   - package-ecosystem: maven
     directory: "/"

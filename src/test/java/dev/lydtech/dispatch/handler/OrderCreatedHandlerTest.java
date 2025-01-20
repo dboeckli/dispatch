@@ -1,7 +1,7 @@
 package dev.lydtech.dispatch.handler;
 
 import dev.lydtech.dispatch.error.NotRetryableException;
-import dev.lydtech.dispatch.message.OrderCreated;
+import dev.lydtech.message.OrderCreated;
 import dev.lydtech.dispatch.service.DispatchService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;

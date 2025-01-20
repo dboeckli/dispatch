@@ -1,10 +1,10 @@
 package dev.lydtech.dispatch.service;
 
 import dev.lydtech.dispatch.client.StockServiceClient;
-import dev.lydtech.dispatch.message.DispatchCompleted;
-import dev.lydtech.dispatch.message.DispatchPreparing;
-import dev.lydtech.dispatch.message.OrderCreated;
-import dev.lydtech.dispatch.message.OrderDispatched;
+import dev.lydtech.message.DispatchCompleted;
+import dev.lydtech.message.DispatchPreparing;
+import dev.lydtech.message.OrderCreated;
+import dev.lydtech.message.OrderDispatched;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
