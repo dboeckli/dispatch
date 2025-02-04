@@ -111,7 +111,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           BRANCH_MVN_VERSION: ${{needs.setup.outputs.BRANCH_MVN_VERSION}}
           BRANCH_NAME: ${{needs.setup.outputs.BRANCH_NAME}}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
         run: |
           set -o pipefail    # don't hide errors within pipes
@@ -167,7 +167,7 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           BRANCH_MVN_VERSION: ${{needs.setup.outputs.BRANCH_MVN_VERSION}}
           BRANCH_NAME: ${{needs.setup.outputs.BRANCH_NAME}}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
         run: |
           set -o pipefail    # don't hide errors within pipes
@@ -206,7 +206,7 @@ jobs:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
           BRANCH_MVN_VERSION: ${{needs.setup.outputs.BRANCH_MVN_VERSION}}
           BRANCH_NAME: ${{needs.setup.outputs.BRANCH_NAME}}
-          DOCKER_USER: ${{ secrets.DOCKER_USER }}
+          DOCKER_USER: ${{ vars.DOCKER_USER }}
           DOCKER_TOKEN: ${{ secrets.DOCKER_ACCESS_TOKEN }}
           ORGANIZATION: ${{needs.setup.outputs.ORGANIZATION}}
           ARTIFACT_ID: ${{needs.setup.outputs.ARTIFACT_ID}}
@@ -226,7 +226,7 @@ jobs:
           done
           
           if [[ "${BRANCH_NAME}" == "master" ||  "${BRANCH_NAME}" == "main" ]]; then
-            mvn -B sonar:sonar \
+            mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                   -s $GITHUB_WORKSPACE/settings.xml \
                   -Dsonar.token=${SONAR_TOKEN} \
                   -Dsonar.host.url=https://sonarcloud.io \
@@ -236,7 +236,7 @@ jobs:
                   -Dsonar.branch.name=master
           else
             mvn -B versions:set -e -DnewVersion="$BRANCH_MVN_VERSION"
-            mvn -B sonar:sonar \
+            mvn -B org.sonarsource.scanner.maven:sonar-maven-plugin:sonar \
                   -s $GITHUB_WORKSPACE/settings.xml \
                   -Dsonar.token=${SONAR_TOKEN} \
                   -Dsonar.host.url=https://sonarcloud.io \
