@@ -1,6 +1,6 @@
 services:
   kafka:
-    image: confluentinc/cp-kafka:7.8.1
+    image: confluentinc/cp-kafka:7.9.0
     hostname: kafka
     container_name: kafka
     ports:
@@ -14,7 +14,8 @@ services:
       KAFKA_PROCESS_ROLES: controller,broker  # Kafka acts as both broker and controller.
       KAFKA_NODE_ID: 1  # A unique ID for this Kafka instance.
       KAFKA_CONTROLLER_QUORUM_VOTERS: "1@localhost:9093"  # Defines the controller voters.
-      KAFKA_LISTENERS: PLAINTEXT://0.0.0.0:9092,CONTROLLER://0.0.0.0:9093,PLAINTEXT_HOST://0.0.0.0:29092
+      # see: https://issues.apache.org/jira/si/jira.issueviews:issue-html/KAFKA-18281/KAFKA-18281.html
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://:29092
       KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: PLAINTEXT:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT,CONTROLLER:PLAINTEXT
       KAFKA_INTER_BROKER_LISTENER_NAME: PLAINTEXT
       KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
