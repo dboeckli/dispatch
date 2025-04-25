@@ -33,7 +33,7 @@ services:
       #- kafka_data:/var/lib/kafka/data  # Store Kafka logs on your local machine.  
   
   wiremock:
-    image: wiremock/wiremock:3.12.1
+    image: wiremock/wiremock:3.13.0
     container_name: wiremock
     ports:
       - "8888:8080"
