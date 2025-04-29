@@ -40,7 +40,7 @@
         <logbook.version>3.10.0</logbook.version>
         <logstash-logback.version>8.0</logstash-logback.version>
         
-        <wiremock.version>3.9.0</wiremock.version>
+        <wiremock.version>3.10.0</wiremock.version>
 
         <!-- Sonar -->
         <sonar-maven-plugin.version>5.1.0.4751</sonar-maven-plugin.version>
