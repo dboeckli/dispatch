@@ -49,7 +49,6 @@
         <sonar.language>java</sonar.language>
         <jacoco.version>0.8.13</jacoco.version>
 
-        <git-commit-id-maven-plugin.version>9.0.1</git-commit-id-maven-plugin.version>
         <!--suppress UnresolvedMavenProperty -->
         <buildNumber>${git.commit.id.abbrev}</buildNumber>
     </properties>
@@ -244,9 +243,10 @@
                 <artifactId>spring-boot-maven-plugin</artifactId>
                 <configuration>
                     <jvmArguments>-Dspring.application.admin.enabled=true</jvmArguments>
+                    <!-- Consider to disable that in production environment  -->
+                    <includeTools>true</includeTools>
                     <layers>
                         <enabled>true</enabled>
-                        <includeLayerTools>true</includeLayerTools>
                     </layers>
                     <excludes>
                         <exclude>
@@ -437,8 +437,7 @@
             -->
             <plugin>
                 <groupId>io.github.git-commit-id</groupId>
-                <artifactId>git-commit-id-maven-plugin</artifactId>
-                <version>${git-commit-id-maven-plugin.version}</version>
+                <artifactId>git-commit-id-maven-plugin</artifactId>                
                 <executions>
                     <execution>
                         <id>get-the-git-infos</id>
