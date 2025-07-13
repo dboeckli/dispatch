@@ -1,0 +1,35 @@
+global:
+  namespace: dispatch
+
+image:
+  repository: wiremock/wiremock
+  tag: "3.13.1"
+  pullPolicy: IfNotPresent
+
+service:
+  type: NodePort
+  port: 8088
+  targetPort: 8080
+  nodePort: 30088
+
+ingress:
+  enabled: false
+
+resources: {}
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
+
+extraArgs:
+  - --global-response-templating
+  - --disable-gzip
+  - --verbose
+
+persistence:
+  enabled: true
+  mountPath: /home/wiremock/mappings
+  accessMode: ReadWriteOnce
+  size: 1Gi

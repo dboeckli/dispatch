@@ -12,9 +12,9 @@ image:
 
 service:
   type: NodePort
-  port: 8080
-  targetPort: 8080
-  nodePort: 30080
+  port: 8082
+  targetPort: 8082
+  nodePort: 30082
 
 resources:
   limits:
@@ -41,6 +41,9 @@ kafka:
   serviceFQDN: "dispatch-kafka.dispatch.svc.cluster.local"
   port: 9092
   clientPort: 29092
+
+wiremock:
+  enabled: true
 
 ingress:
   enabled: false

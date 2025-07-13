@@ -1,0 +1,85 @@
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: wiremock-mappings
+data:
+  health_readiness.json: |
+    {
+      "priority": 1,
+      "request": {
+        "method": "GET",
+        "url": "/actuator/health/readiness"
+      },
+      "response": {
+        "status": 200,
+        "headers": {
+          "Content-Type": "application/json"
+        },
+        "jsonBody": {
+          "status": "UP"
+        }
+      }
+    }
+  return_200.json: |
+    {
+      "priority": 9,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/stock.*"
+      },
+      "response": {
+        "status": 200,
+        "body": "true"
+      }
+    }
+  return_400.json: |
+    {
+      "priority": 1,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/stock\\?item=.*_400"
+      },
+      "response": {
+        "status": 400
+      }
+    }
+  return_500.json: |
+    {
+      "priority": 1,
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/stock\\?item=.*_500"
+      },
+      "response": {
+        "status": 500
+      }
+    }
+  return_transient_502_step1.json: |
+    {
+      "priority": 1,
+      "scenarioName": "transient 502",
+      "requiredScenarioState": "Started",
+      "newScenarioState": "success",
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/stock\\?item=.*_502"
+      },
+      "response": {
+        "status": 502
+      }
+    }
+  return_transient_502_step2.json: |
+    {
+      "priority": 1,
+      "scenarioName": "transient 502",
+      "requiredScenarioState": "success",
+      "newScenarioState": "Started",
+      "request": {
+        "method": "GET",
+        "urlPattern": "/api/stock\\?item=.*_502"
+      },
+      "response": {
+        "status": 200,
+        "body": "true"
+      }
+    }

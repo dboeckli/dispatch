@@ -10,6 +10,12 @@ dependencies:
     version: @helm.chart.version@
     repository: file://charts/kafka
     condition: kafka.enabled
+
+  - name: wiremock
+    version: @helm.chart.version@
+    repository: file://charts/wiremock
+    condition: wiremock.enabled
+
   - name: tracking
     version: "v0.0.1-SNAPSHOT"
     repository: "oci://registry-1.docker.io/domboeckli"

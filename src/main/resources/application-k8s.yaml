@@ -1,3 +1,6 @@
+server:
+  port: 8082
+
 spring:
   application:
     name: dispatch
@@ -97,3 +100,4 @@ logbook:
       - path: /**/resources/**
       - path: /webjars/**
         # Add more exclusions as needed
+

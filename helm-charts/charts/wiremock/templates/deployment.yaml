@@ -1,0 +1,41 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "wiremock.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "wiremock.labels" . | nindent 4 }}
+    app.kubernetes.io/component: wiremock
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      {{- include "wiremock.selectorLabels" . | nindent 6 }}
+      app.kubernetes.io/component: wiremock
+  template:
+    metadata:
+      labels:
+        {{- include "wiremock.selectorLabels" . | nindent 8 }}
+        app.kubernetes.io/component: wiremock
+    spec:
+      containers:
+        - name: wiremock
+          image: wiremock/wiremock:3.13.1
+          imagePullPolicy: IfNotPresent
+          #args:
+          #  - "--root-dir=/home/wiremock"
+          #  - "--global-response-templating"
+          #  - "--disable-gzip"
+          #  - "--verbose"
+          #  - "--enable-ui"
+          ports:
+            - name: wiremock
+              containerPort: {{ .Values.service.port }}
+              protocol: TCP
+          volumeMounts:
+            - name: wiremock-mappings
+              mountPath: /home/wiremock/mappings
+      volumes:
+        - name: wiremock-mappings
+          configMap:
+            name: wiremock-mappings

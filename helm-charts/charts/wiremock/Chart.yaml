@@ -1,0 +1,6 @@
+apiVersion: v2
+name: wiremock
+description: A Helm subchart for wiremock
+type: application
+version: @helm.chart.version@
+appVersion: "3.13.1"

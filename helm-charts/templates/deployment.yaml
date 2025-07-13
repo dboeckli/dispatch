@@ -28,16 +28,25 @@ spec:
             - sh
             - -c
             - |
-              until kafka-broker-api-versions.sh --bootstrap-server {{ .Values.kafka.serviceFQDN  }}:{{ .Values.kafka.clientPort }}; do
-                echo "[bitnami/kafka: wait-for-kafka-ready] Waiting for Kafka API versions to be available..."
+              exit_code=999
+              until output1=$(kafka-broker-api-versions.sh --bootstrap-server {{ .Values.kafka.serviceFQDN }}:{{ .Values.kafka.clientPort }} 2>&1); do
+                exit_code=$?
+                echo "[bitnami/kafka: wait-for-kafka-ready] Waiting for Kafka API versions to be available... (Exit code: $exit_code)"
+                echo "[bitnami/kafka: wait-for-kafka-ready] Output Kafka API versions: $output1"
                 sleep 5
               done
               echo "[bitnami/kafka: wait-for-kafka-ready] Kafka API versions check successful!"
-              until kafka-topics.sh --bootstrap-server {{ .Values.kafka.serviceFQDN  }}:{{ .Values.kafka.port }} --list; do
-                echo "[bitnami/kafka: wait-for-kafka-ready] Waiting for Kafka List Topics..."
+              echo "[bitnami/kafka: wait-for-kafka-ready] Output Kafka API versions: $output1"
+
+              exit_code=999
+              until output2=$(kafka-topics.sh --bootstrap-server {{ .Values.kafka.serviceFQDN }}:{{ .Values.kafka.clientPort }} --list 2>&1); do
+                exit_code=$?
+                echo "[bitnami/kafka: wait-for-kafka-ready] Waiting for Kafka List Topics... (Exit code: $exit_code)"
+                echo "[bitnami/kafka: wait-for-kafka-ready] Output Kafka List Topics: $output2"
                 sleep 5
               done
-              echo "[bitnami/kafka: wait-for-kafka-ready] Waiting for Kafka List Topics!"
+              echo "[bitnami/kafka: wait-for-kafka-ready] Kafka List Topics successful!"
+              echo "[bitnami/kafka: wait-for-kafka-ready] Output Kafka List Topics: $output2"
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
