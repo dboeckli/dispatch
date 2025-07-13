@@ -1,0 +1,6 @@
+apiVersion: v2
+name: kafka
+description: A Helm subchart for Kafka
+type: application
+version: @helm.chart.version@
+appVersion: "7.9"

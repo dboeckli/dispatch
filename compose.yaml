@@ -27,10 +27,15 @@ services:
       KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1  # Since we’re running one broker, one replica is enough.
       KAFKA_LOG_RETENTION_HOURS: 168  # Keep logs for 7 days.
       KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0  # No delay for consumer rebalancing.
-      CLUSTER_ID: "Mk3OEYBSD34fcwNTJENDM2Qk" 
+      CLUSTER_ID: "Mk3OEYBSD34fcwNTJENDM2Qk_DISPATCH"
     #volumes:
       # Diese Zeile definiert ein Volume-Mapping. Es verbindet das ./kafka-data-Verzeichnis auf dem Host-System mit dem /var/lib/kafka/data-Verzeichnis im Kafka-Container.
-      #- kafka_data:/var/lib/kafka/data  # Store Kafka logs on your local machine.  
+      #- kafka_data:/var/lib/kafka/data  # Store Kafka logs on your local machine.
+    healthcheck:
+      test: [ "CMD", "kafka-broker-api-versions", "--bootstrap-server", "localhost:9092" ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
   
   wiremock:
     image: wiremock/wiremock:3.13.1
@@ -56,8 +61,45 @@ services:
       SPRING_KAFKA_CONSUMER_BOOTSTRAP-SERVERS: kafka:9092
     depends_on:
       kafka:
+        condition: service_healthy
+        required: true
+
+  busybox:
+    image: busybox:1.37.0
+    container_name: busybox
+    depends_on:
+      wiremock:
         condition: service_started
         required: true
+      tracking-service:
+        condition: service_started
+        required: true
+    healthcheck:
+      test: [ "CMD", "sh", "-c", "
+            echo 'Checking BusyBox readiness...' &&
+            test -f /bin/sh &&
+            wget -qO- http://wiremock:8080/actuator/health/readiness | grep -q '\"status\":\"UP\"' &&
+            wget -qO- http://tracking-service:8081/actuator/health/readiness | grep -q '\"status\":\"UP\"'
+          " ]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    command: >
+      /bin/sh -c '
+      while true; do
+        wiremock_health=$$(wget -q -O - http://wiremock:8080/actuator/health/readiness 2>/dev/null)
+        tracking_service_health=$$(wget -q -O - http://tracking-service:8081/actuator/health/readiness 2>/dev/null)
+
+        echo "{
+          \"timestamp\": \"$$(date -Iseconds)\",
+          \"services\": {
+            \"wiremock\": $$wiremock_health,
+            \"tracking-service\": $$tracking_service_health
+          }
+        }"
+        sleep 15
+      done
+      '              
         
 #volumes:
 #  kafka_data:        

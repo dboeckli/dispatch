@@ -1,0 +1,89 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "application-template.fullname" . }}
+  namespace: {{ .Values.global.namespace }}
+  labels:
+    {{- include "application-template.labels" . | nindent 4 }}
+spec:
+  replicas: {{ .Values.replicaCount }}
+  selector:
+    matchLabels:
+      {{- include "application-template.selectorLabels" . | nindent 6 }}
+  template:
+    metadata:
+      labels:
+        {{- include "application-template.selectorLabels" . | nindent 8 }}
+    spec:
+      initContainers:
+        - name: wait-for-kafka-internal
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z {{ .Values.kafka.serviceFQDN  }} {{ .Values.kafka.port }}; do echo "[busybox: wait-for-kafka-internal] waiting for kafka"; sleep 2; done; echo "[busybox: wait-for-kafka-internal] kafka is available"' ]
+        - name: wait-for-kafka-client
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z {{ .Values.kafka.serviceFQDN  }} {{ .Values.kafka.clientPort }}; do echo "[busybox: wait-for-kafka-client] waiting for kafka"; sleep 2; done; echo "[busybox: wait-for-kafka-client] kafka is available"' ]
+        - name: wait-for-kafka-ready
+          image: bitnami/kafka:3.7.1
+          command:
+            - sh
+            - -c
+            - |
+              until kafka-broker-api-versions.sh --bootstrap-server {{ .Values.kafka.serviceFQDN  }}:{{ .Values.kafka.clientPort }}; do
+                echo "[bitnami/kafka: wait-for-kafka-ready] Waiting for Kafka API versions to be available..."
+                sleep 5
+              done
+              echo "[bitnami/kafka: wait-for-kafka-ready] Kafka API versions check successful!"
+              until kafka-topics.sh --bootstrap-server {{ .Values.kafka.serviceFQDN  }}:{{ .Values.kafka.port }} --list; do
+                echo "[bitnami/kafka: wait-for-kafka-ready] Waiting for Kafka List Topics..."
+                sleep 5
+              done
+              echo "[bitnami/kafka: wait-for-kafka-ready] Waiting for Kafka List Topics!"
+      containers:
+        - name: {{ .Chart.Name }}
+          image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
+          imagePullPolicy: IfNotPresent
+          env:
+            - name: JAVA_TIMEZONE
+              value: "{{ .Values.global.timezone }}"
+            - name: SPRING_PROFILES_ACTIVE
+              value: "k8s"
+            - name: LOGGING_CONFIG
+              value: "classpath:logback-spring.xml"
+            - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
+              value: "{{ .Values.kafka.serviceFQDN }}:{{ .Values.kafka.clientPort }}"
+
+          ports:
+            - name: http
+              containerPort: {{ .Values.service.targetPort }}
+              protocol: TCP
+          startupProbe:
+            httpGet:
+              path: /actuator/health
+              port: http
+            failureThreshold: {{ .Values.probes.startup.failureThreshold }}
+            periodSeconds: {{ .Values.probes.startup.periodSeconds }}
+          readinessProbe:
+            httpGet:
+              path: /actuator/health/readiness
+              port: http
+            periodSeconds: {{ .Values.probes.readiness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.readiness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.readiness.failureThreshold }}
+          livenessProbe:
+            httpGet:
+              path: /actuator/health/liveness
+              port: http
+            periodSeconds: {{ .Values.probes.liveness.periodSeconds }}
+            timeoutSeconds: {{ .Values.probes.liveness.timeoutSeconds }}
+            failureThreshold: {{ .Values.probes.liveness.failureThreshold }}
+          volumeMounts:
+            - mountPath: "{{ .Values.global.timezonePath }}"
+              name: time
+              readOnly: true
+          resources:
+            {{- toYaml .Values.resources | nindent 12 }}
+      volumes:
+        - name: time
+          hostPath:
+            path: {{ .Values.global.timezonePath }}
+            type: ""

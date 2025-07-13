@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Slf4j
 @EmbeddedKafka(controlledShutdown = true)
 @EnableWireMock
-public class OrderCreatedHandlerWithEmbeddedKafkaIT {
+public class OrderCreatedHandlerWithEmbeddedKafkaTest {
 
     @Value("${wiremock.server.baseUrl}")
     private String wireMockUrl;

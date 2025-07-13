@@ -1,0 +1,18 @@
+global:
+  namespace: dispatch
+
+kafka:
+  type: NodePort
+
+  port: 9092
+  targetPort: 9092
+  nodePort: 30092
+
+  clientPort: 29092
+  controllerPort: 9093
+
+  listenersString: "PLAINTEXT://:9092,CONTROLLER://:9093,PLAINTEXT_HOST://0.0.0.0:29092"
+  securityProtocolMap: "PLAINTEXT:PLAINTEXT,CONTROLLER:PLAINTEXT,PLAINTEXT_HOST:PLAINTEXT"
+  advertisedListenersString: "PLAINTEXT://dispatch-kafka.dispatch.svc.cluster.local:9092,PLAINTEXT_HOST://dispatch-kafka.dispatch.svc.cluster.local:29092"
+
+  serviceFQDN: "dispatch-kafka.dispatch.svc.cluster.local"

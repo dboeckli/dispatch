@@ -1,0 +1,12 @@
+apiVersion: v2
+name: @project.artifactId@
+description: A Helm chart for Spring 6 Project
+type: application
+version: @helm.chart.version@
+appVersion: @project.version@
+
+dependencies:
+  - name: kafka
+    version: @helm.chart.version@
+    repository: file://charts/kafka
+    condition: kafka.enabled
