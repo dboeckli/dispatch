@@ -22,12 +22,10 @@ spec:
         - name: wiremock
           image: wiremock/wiremock:3.13.1
           imagePullPolicy: IfNotPresent
-          #args:
-          #  - "--root-dir=/home/wiremock"
-          #  - "--global-response-templating"
-          #  - "--disable-gzip"
-          #  - "--verbose"
-          #  - "--enable-ui"
+          args:
+          - "--global-response-templating"
+          - "--disable-gzip"
+          - "--verbose"
           ports:
             - name: wiremock
               containerPort: {{ .Values.service.port }}

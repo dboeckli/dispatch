@@ -55,7 +55,7 @@ management:
       show-details: always
       
 dispatch:
-  stockServiceEndpoint: http://localhost:8888/api/stock      
+  stockServiceEndpoint: http://localhost:30088/api/stock
 
 logging:
   level:
