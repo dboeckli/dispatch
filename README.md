@@ -11,9 +11,6 @@ This application can be tested in two way:
 Send Message:
 For that you need a kafka cli environment which will be available when you have done the kafka wsl setup
 
-TODO: WIREMOCK UI: http://localhost:30088/__admin/ or http://localhost:8888/__admin/
-See: https://wiremock.org/docs/standalone/admin-api-reference/#tag/Stub-Mappings
-
 use at home:
 ```
 cd ~/tools/kafka/kafka_2.13-3.9.0
@@ -78,6 +75,10 @@ echo '__TypeId__:dev.lydtech.message.DispatchCompleted|{"orderId":"8ed0dc67-41a4
   --property "headers.delimiter=|" \
   --property "headers.key.separator=:"
 ```
+### Wiremock
+
+WIREMOCK UI: http://localhost:30088/__admin/ or http://localhost:8888/__admin/
+See: https://wiremock.org/docs/standalone/admin-api-reference/#tag/Stub-Mappings
 
 ### Deployment with Helm
 
