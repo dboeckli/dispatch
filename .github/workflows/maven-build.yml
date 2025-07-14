@@ -384,9 +384,7 @@ jobs:
 
     steps:
       - name: Trigger Deployment
-        # TODO: ENABLE ME
-        #if: success()
-        if: false
+        if: success()
         env:
           GH_TOKEN: ${{ secrets.TRIGGER_WORKFLOW_TOKEN }}
           BRANCH_MVN_VERSION: ${{needs.setup.outputs.BRANCH_MVN_VERSION}}
