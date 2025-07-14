@@ -52,6 +52,8 @@ ingress:
 
 # Section for overriding values in subcharts defined in the Chart.yaml
 tracking:
+  dispatch:
+    enabled: false
   kafka:
     enabled: false
     serviceFQDN: "dispatch-kafka.dispatch.svc.cluster.local"
