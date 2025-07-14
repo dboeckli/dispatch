@@ -44,6 +44,8 @@ kafka:
 
 wiremock:
   enabled: true
+  serviceFQDN: "dispatch-wiremock.dispatch.svc.cluster.local"
+  port: 8088
 
 ingress:
   enabled: false

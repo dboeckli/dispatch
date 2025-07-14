@@ -53,28 +53,18 @@ docker exec -it kafka /bin/bash
 
 Terminal 1: start a consumer
 ```
-./kafka-console-consumer --bootstrap-server localhost:9092 --topic dispatch.tracking --from-beginning --property print.headers=true
+./kafka-console-consumer --bootstrap-server localhost:9092 --topic order.created --from-beginning --property print.headers=true
 ```
 
-Terminal 2: send a DispatchPreparing-Message to topic dispatch.tracking
+Terminal 2: send a OrderCreated-Message to topic order.created
 ```
-echo '__TypeId__:dev.lydtech.message.DispatchPreparing|{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92"}' | /usr/bin/kafka-console-producer \
+echo '"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}' | /usr/bin/kafka-console-producer \
   --bootstrap-server localhost:9092 \
-  --topic dispatch.tracking \
-  --property parse.headers=true \
-  --property "headers.delimiter=|" \
-  --property "headers.key.separator=:"
+  --topic order.created \
+  --property parse.key=true \
+  --property "key.separator=:"
 ```
 
-Terminal 2: send a DispatchCompleted-Message to topic dispatch.tracking
-```
-echo '__TypeId__:dev.lydtech.message.DispatchCompleted|{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92"}' | /usr/bin/kafka-console-producer \
-  --bootstrap-server localhost:9092 \
-  --topic dispatch.tracking \
-  --property parse.headers=true \
-  --property "headers.delimiter=|" \
-  --property "headers.key.separator=:"
-```
 ### Wiremock
 
 WIREMOCK UI: http://localhost:30088/__admin/ or http://localhost:8888/__admin/
@@ -152,6 +142,15 @@ run kafka commands
 ```powershell
 cd /opt/bitnami/kafka/bin
 ./kafka-topics.sh --bootstrap-server dispatch-kafka.dispatch.svc.cluster.local:29092 --list
+```
+
+Send a a OrderCreated-Message to topic order.created
+```
+echo '"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}' | kafka-console-producer.sh \
+  --bootstrap-server dispatch-kafka.dispatch.svc.cluster.local:29092 \
+  --topic order.created \
+  --property parse.key=true \
+  --property "key.separator=:"
 ```
 
 You can use the actuator rest call to verify via port 30081

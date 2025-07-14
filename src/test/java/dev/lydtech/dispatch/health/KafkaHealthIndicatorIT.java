@@ -1,9 +1,8 @@
-package dev.lydtech.dispatch.core;
+package dev.lydtech.dispatch.health;
 
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.info.BuildProperties;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.annotation.DirtiesContext;
@@ -21,39 +20,10 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("docker")
 @Slf4j
-public class ActuatorInfoIT {
+class KafkaHealthIndicatorIT {
 
     @Autowired
     private MockMvc mockMvc;
-
-    @Autowired
-    private BuildProperties buildProperties;
-
-    @Test
-    void actuatorInfoTest() throws Exception {
-        MvcResult result = mockMvc.perform(get("/actuator/info"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.git.commit.id").isString())
-            
-            .andExpect(jsonPath("$.build.javaVersion").value("21"))
-            .andExpect(jsonPath("$.build.commit-id").isString())
-            .andExpect(jsonPath("$.build.javaVendor").isString())
-            .andExpect(jsonPath("$.build.artifact").value(buildProperties.getArtifact()))
-            .andExpect(jsonPath("$.build.group").value(buildProperties.getGroup()))
-            .andReturn();
-        
-        log.info("Response: {}", result.getResponse().getContentAsString());
-    }
-
-    @Test
-    void actuatorHealthTest() throws Exception {
-        MvcResult result = mockMvc.perform(get("/actuator/health/readiness"))
-            .andExpect(status().isOk())
-            .andExpect(jsonPath("$.status").value("UP"))
-            .andReturn();
-
-        log.info("Response: {}", result.getResponse().getContentAsString());
-    }
 
     @Test
     void kafkaHealthIndicatorTest() throws Exception {
@@ -82,5 +52,5 @@ public class ActuatorInfoIT {
 
         log.info("Kafka Health Response: {}", result.getResponse().getContentAsString());
     }
-    
+
 }

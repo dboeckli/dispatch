@@ -28,7 +28,7 @@ spec:
           - "--verbose"
           ports:
             - name: wiremock
-              containerPort: {{ .Values.service.port }}
+              containerPort: {{ .Values.service.targetPort }}
               protocol: TCP
           volumeMounts:
             - name: wiremock-mappings

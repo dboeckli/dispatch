@@ -47,6 +47,9 @@ spec:
               done
               echo "[bitnami/kafka: wait-for-kafka-ready] Kafka List Topics successful!"
               echo "[bitnami/kafka: wait-for-kafka-ready] Output Kafka List Topics: $output2"
+        - name: wait-for-wiremock
+          image: busybox:1.37.0
+          command: [ 'sh', '-c', 'until nc -z {{ .Values.wiremock.serviceFQDN  }} {{ .Values.wiremock.port }}; do echo "[busybox: wait-for-wiremock] waiting for wiremock"; sleep 2; done; echo "[busybox: wait-for-wiremock] wiremock is available"' ]
       containers:
         - name: {{ .Chart.Name }}
           image: "{{ .Values.image.repository }}:{{ .Values.image.tag | default .Chart.AppVersion }}"
@@ -60,6 +63,8 @@ spec:
               value: "classpath:logback-spring.xml"
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: "{{ .Values.kafka.serviceFQDN }}:{{ .Values.kafka.clientPort }}"
+            - name: DISPATCH_STOCKSERVICEENDPOINT
+              value: "http://{{ .Values.wiremock.serviceFQDN }}:{{ .Values.wiremock.port }}/api/stock "
 
           ports:
             - name: http
