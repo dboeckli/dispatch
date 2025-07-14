@@ -44,8 +44,114 @@ bin/kafka-console-producer.sh --bootstrap-server localhost:29092 --topic order.c
 >"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}
 ```
 
-## TODO's
+When started with docker compose and kafka is up and running
 
-the message classes should go from package to 'dev.lydtech.dispatch.message' to the package 'dev.lydtech.message' or even better into a separate lib project.
-Reason: they are shared with the dispatch project and now they are duplicated and this can cause conflicts.
+open shell of kafka container
+```
+docker exec -it kafka /bin/bash
+```
+
+Terminal 1: start a consumer
+```
+./kafka-console-consumer --bootstrap-server localhost:9092 --topic order.created --from-beginning --property print.headers=true
+```
+
+Terminal 2: send a OrderCreated-Message to topic order.created
+```
+echo '"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}' | /usr/bin/kafka-console-producer \
+  --bootstrap-server localhost:9092 \
+  --topic order.created \
+  --property parse.key=true \
+  --property "key.separator=:"
+```
+
+### Wiremock
+
+WIREMOCK UI: http://localhost:30088/__admin/ or http://localhost:8888/__admin/
+See: https://wiremock.org/docs/standalone/admin-api-reference/#tag/Stub-Mappings
+
+### Deployment with Helm
+
+Be aware that we are using a different namespace here (not default).
+
+To run maven filtering for destination target/helm
+```bash
+mvn clean install -DskipTests 
+```
+
+Go to the directory where the tgz file has been created after 'mvn install'
+```powershell
+cd target/helm/repo
+```
+
+unpack
+```powershell
+$file = Get-ChildItem -Filter dispatch-v*.tgz | Select-Object -First 1
+tar -xvf $file.Name
+```
+
+install
+```powershell
+$APPLICATION_NAME = Get-ChildItem -Directory | Where-Object { $_.LastWriteTime -ge $file.LastWriteTime } | Select-Object -ExpandProperty Name
+helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace dispatch --create-namespace --wait --timeout 8m --debug --render-subchart-notes
+```
+
+show logs
+```powershell
+kubectl get pods -l app.kubernetes.io/name=$APPLICATION_NAME -n dispatch
+```
+replace $POD with pods from the command above
+```powershell
+kubectl logs $POD -n dispatch --all-containers
+```
+
+test
+```powershell
+helm test $APPLICATION_NAME --namespace dispatch --logs
+```
+
+uninstall
+```powershell
+helm uninstall $APPLICATION_NAME --namespace dispatch
+```
+
+delete all
+```powershell
+kubectl delete all --all -n dispatch
+```
+
+create busybox sidecar
+```powershell
+kubectl run busybox-test --rm -it --image=busybox:1.36 --namespace=dispatch --command -- sh
+```
+
+and analyze kafka connections
+```powershell
+nslookup dispatch-kafka.dispatch.svc.cluster.local
+
+nc -zv dispatch-kafka.dispatch.svc.cluster.local 29092
+echo "Exit code for port 29092: $?"
+```
+
+create kafka sidecar
+```powershell
+kubectl run kafka-test --rm -it --image=bitnami/kafka:3.7.1 --namespace=dispatch --command -- sh
+```
+
+run kafka commands
+```powershell
+cd /opt/bitnami/kafka/bin
+./kafka-topics.sh --bootstrap-server dispatch-kafka.dispatch.svc.cluster.local:29092 --list
+```
+
+Send a a OrderCreated-Message to topic order.created
+```
+echo '"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}' | kafka-console-producer.sh \
+  --bootstrap-server dispatch-kafka.dispatch.svc.cluster.local:29092 \
+  --topic order.created \
+  --property parse.key=true \
+  --property "key.separator=:"
+```
+
+You can use the actuator rest call to verify via port 30081
 

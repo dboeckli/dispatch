@@ -1,0 +1,11 @@
+### actuator health
+GET http://localhost:{{tracking-service-port}}/actuator/health
+Accept: application/json
+
+### actuator health
+GET http://localhost:{{tracking-service-port}}/actuator/health/kafka
+Accept: application/json
+
+### actuator info
+GET http://localhost:{{tracking-service-port}}/actuator/info
+Accept: application/json

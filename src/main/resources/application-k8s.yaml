@@ -4,34 +4,32 @@ server:
 spring:
   application:
     name: dispatch
-  kafka:
-    # See: https://docs.conduktor.io/desktop/kafka-cluster-connection/setting-up-a-connection-to-kafka/connecting-to-kafka-running-on-windows-wsl-2/#two-ways-to-fix-this
-    # and: https://stackoverflow.com/questions/46158296/kafka-broker-not-available-at-starting
-    bootstrap-servers: "[::1]:29092"
-    
-    admin:
-      auto-create: false
-      properties:
-        bootstrap.servers: "[::1]:29092"
-    consumer:
-      # configs below are not taken anymore because we have the DispatchConfiguration class
-      bootstrap-servers: "[::1]:29092"
-      #value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.ErrorHandlingDeserializer
-      auto-offset-reset: earliest
-      properties:
-        spring.deserializer.value.delegate.class: org.springframework.kafka.support.serializer.JsonDeserializer
-        spring.json.value.default.type: dev.lydtech.dispatch.message.OrderCreated
-        spring.json.trusted.packages: "*"
-        allow.auto.create.topics: false
-  
+
   docker:
     compose:
       enabled: true
       stop:
         command: down
       skip:
-        in-tests: false  
+        in-tests: true
+
+  kafka:
+    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    consumer:
+      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      group-id: sfg
+      auto-offset-reset: earliest
+      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
+      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      properties:
+        spring.json.trusted.packages: "*"
+        allow.auto.create.topics: false
+    producer:
+      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+      key-serializer: org.apache.kafka.common.serialization.StringSerializer
+      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+    properties:
+      client.dns.lookup: use_all_dns_ips
 
 management:
   health:
@@ -57,8 +55,8 @@ management:
       show-details: always
       
 dispatch:
-  stockServiceEndpoint: http://localhost:8888/api/stock 
-    
+  stockServiceEndpoint: http://localhost:30088/api/stock
+
 logging:
   level:
     org.zalando.logbook: TRACE
@@ -101,4 +99,5 @@ logbook:
       - path: /**/public/**
       - path: /**/resources/**
       - path: /webjars/**
-        # Add more exclusions as needed      
+        # Add more exclusions as needed
+

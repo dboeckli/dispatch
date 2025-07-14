@@ -25,6 +25,7 @@ public class StockServiceClient {
         log.info("Attempting to call stock service at URL: {}", url);
         try {
             ResponseEntity<String> response = restTemplate.getForEntity(url, String.class);
+            log.info("Call to stock service was successull. response was: {}", response);
             if (!response.getStatusCode().is2xxSuccessful()) {
                 throw new RuntimeException("error " + response.getStatusCode());
             }
