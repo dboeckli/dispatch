@@ -64,7 +64,7 @@ spec:
             - name: SPRING_KAFKA_BOOTSTRAP_SERVERS
               value: "{{ .Values.kafka.serviceFQDN }}:{{ .Values.kafka.clientPort }}"
             - name: DISPATCH_STOCKSERVICEENDPOINT
-              value: "http://{{ .Values.wiremock.serviceFQDN }}:{{ .Values.wiremock.port }}/api/stock "
+              value: "http://{{ .Values.wiremock.serviceFQDN }}:{{ .Values.wiremock.port }}/api/stock"
 
           ports:
             - name: http
