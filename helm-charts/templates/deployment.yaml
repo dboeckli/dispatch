@@ -23,7 +23,7 @@ spec:
           image: busybox:1.37.0
           command: [ 'sh', '-c', 'until nc -z {{ .Values.kafka.serviceFQDN  }} {{ .Values.kafka.clientPort }}; do echo "[busybox: wait-for-kafka-client] waiting for kafka"; sleep 2; done; echo "[busybox: wait-for-kafka-client] kafka is available"' ]
         - name: wait-for-kafka-ready
-          image: bitnami/kafka:3.7.1
+          image: bitnami/kafka:3.9.0
           command:
             - sh
             - -c

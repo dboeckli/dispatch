@@ -133,9 +133,9 @@ nc -zv dispatch-kafka.dispatch.svc.cluster.local 29092
 echo "Exit code for port 29092: $?"
 ```
 
-create kafka sidecar
+create bitnami/kafka sidecar and open bash
 ```powershell
-kubectl run kafka-test --rm -it --image=bitnami/kafka:3.7.1 --namespace=dispatch --command -- sh
+kubectl run kafka-test --rm -it --image=bitnami/kafka:3.9.0 --namespace=dispatch --command -- bash
 ```
 
 run kafka commands
@@ -144,14 +144,14 @@ cd /opt/bitnami/kafka/bin
 ./kafka-topics.sh --bootstrap-server dispatch-kafka.dispatch.svc.cluster.local:29092 --list
 ```
 
-Send a a OrderCreated-Message to topic order.created
-```
+Send a OrderCreated-Message to topic order.created
+```bash
 echo '"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}' | kafka-console-producer.sh \
-  --bootstrap-server dispatch-kafka.dispatch.svc.cluster.local:29092 \
-  --topic order.created \
-  --property parse.key=true \
-  --property "key.separator=:"
+--bootstrap-server dispatch-kafka.dispatch.svc.cluster.local:29092 \
+--topic order.created \
+--property parse.key=true \
+--property "key.separator=:"
 ```
 
-You can use the actuator rest call to verify via port 30081
+You can use the actuator rest call to verify via port 30082
 
