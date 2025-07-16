@@ -10,16 +10,6 @@ image:
   repository: @docker.repo@/@project.artifactId@
   tag: @project.version@
 
-bitnamiKafkaImage:
-  repository: bitnami/kafka
-  tag: "3.9.0"
-  pullPolicy: IfNotPresent
-
-busyboxImage:
-  repository: busybox
-  tag: "1.37.0"
-  pullPolicy: IfNotPresent
-
 service:
   type: NodePort
   port: 8082
