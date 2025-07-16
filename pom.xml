@@ -639,6 +639,9 @@
                     <useLocalHelmBinary>true</useLocalHelmBinary>
                     <skip>false</skip>
                     <templateOutputDir>${project.build.directory}/helm-templated</templateOutputDir>
+                    <values>
+                        <yamlFile>${project.build.directory}/helm-charts/dependencies-values.yaml</yamlFile>
+                    </values>
                 </configuration>
 
                 <executions>
