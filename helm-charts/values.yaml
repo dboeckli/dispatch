@@ -6,9 +6,9 @@ global:
 
 replicaCount: 1
 
-image: # renovate:ignore
-  repository: @docker.repo@/@project.artifactId@ # renovate:ignore
-  tag: @project.version@ # renovate:ignore
+image:
+  repository: @docker.repo@/@project.artifactId@
+  tag: @project.version@
 
 bitnamiKafkaImage:
   repository: bitnami/kafka
