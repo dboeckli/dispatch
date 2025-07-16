@@ -28,7 +28,7 @@
             "/helm-charts/.+\\.ya?ml$/"
         ]
     },
-    "ignorePaths": ["**/helm-charts/values.yaml/image/**"],
+    "ignorePaths": ["helm-charts/values.yaml/image/**"],
     "helm-values": {
         "managerFilePatterns": [
             "/helm-charts/values\\.ya?ml$/",
