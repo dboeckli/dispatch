@@ -10,7 +10,8 @@ metadata:
 spec:
   containers:
     - name: test-kafka-connection
-      image: bitnami/kafka:3.9.0
+      image: {{ .Values.bitnamiKafkaImage.repository }}:{{ .Values.bitnamiKafkaImage.tag }}
+      imagePullPolicy: {{ .Values.bitnamiKafkaImage.pullPolicy }}
       command: ['/bin/bash', '-c']
       args:
         - |

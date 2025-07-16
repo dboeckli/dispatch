@@ -1,6 +1,21 @@
 global:
   namespace: dispatch
 
+image:
+  repository: confluentinc/cp-kafka
+  tag: "7.9.2"
+  pullPolicy: IfNotPresent
+
+bitnamiKafkaImage:
+  repository: bitnami/kafka
+  tag: "3.9.0"
+  pullPolicy: IfNotPresent
+
+busyboxImage:
+  repository: busybox
+  tag: "1.37.0"
+  pullPolicy: IfNotPresent
+
 kafka:
   type: NodePort
 
