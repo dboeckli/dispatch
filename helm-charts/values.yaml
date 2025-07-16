@@ -6,6 +6,18 @@ global:
 
 replicaCount: 1
 
+# renovate:disable
+image:
+  repository: @docker.repo@/@project.artifactId@
+  tag: @project.version@
+# renovate:enable
+
+service:
+  type: NodePort
+  port: 8082
+  targetPort: 8082
+  nodePort: 30082
+
 bitnamiKafkaImage:
   repository: bitnami/kafka
   tag: "3.9.0"
@@ -15,18 +27,6 @@ busyboxImage:
   repository: busybox
   tag: "1.37.0"
   pullPolicy: IfNotPresent
-
-image:
-  #repository: @docker.repo@/@project.artifactId@
-  #tag: @project.version@
-  repository: domboeckli/dispatch
-  tag: 0.0.1-SNAPSHOT
-
-service:
-  type: NodePort
-  port: 8082
-  targetPort: 8082
-  nodePort: 30082
 
 resources:
   limits:
