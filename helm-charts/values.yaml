@@ -17,8 +17,10 @@ busyboxImage:
   pullPolicy: IfNotPresent
 
 image:
-  repository: @docker.repo@/@project.artifactId@
-  tag: @project.version@
+  #repository: @docker.repo@/@project.artifactId@
+  #tag: @project.version@
+  repository: domboeckli/dispatch
+  tag: 0.0.1-SNAPSHOT
 
 service:
   type: NodePort
