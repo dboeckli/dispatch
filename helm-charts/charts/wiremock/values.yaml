@@ -6,6 +6,11 @@ image:
   tag: "3.13.1"
   pullPolicy: IfNotPresent
 
+busyboxImage:
+  repository: busybox
+  tag: "1.37.0"
+  pullPolicy: IfNotPresent
+
 service:
   type: NodePort
   port: 8088
