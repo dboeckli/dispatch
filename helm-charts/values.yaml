@@ -6,10 +6,6 @@ global:
 
 replicaCount: 1
 
-image:
-  repository: @docker.repo@/@project.artifactId@
-  tag: @project.version@
-
 bitnamiKafkaImage:
   repository: bitnami/kafka
   tag: "3.9.0"
@@ -19,6 +15,10 @@ busyboxImage:
   repository: busybox
   tag: "1.37.0"
   pullPolicy: IfNotPresent
+
+image:
+  repository: @docker.repo@/@project.artifactId@
+  tag: @project.version@
 
 service:
   type: NodePort
