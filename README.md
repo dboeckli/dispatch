@@ -93,7 +93,7 @@ tar -xvf $file.Name
 install
 ```powershell
 $APPLICATION_NAME = Get-ChildItem -Directory | Where-Object { $_.LastWriteTime -ge $file.LastWriteTime } | Select-Object -ExpandProperty Name
-helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME -f "./$APPLICATION_NAME/dependencies-values.yaml" --namespace dispatch --create-namespace --wait --timeout 8m --debug --render-subchart-notes
+helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace dispatch --create-namespace --wait --timeout 8m --debug --render-subchart-notes
 ```
 
 show logs

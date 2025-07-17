@@ -68,7 +68,6 @@ jobs:
           echo "Deploying Application $APPLICATION_NAME: $APP_VERSION"
           helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME \
           --set image.tag=${APP_VERSION} \
-          -f ./$APPLICATION_NAME/dependencies-values.yaml \
           --namespace ${NAMESPACE} \
           --create-namespace \
           --cleanup-on-fail \
