@@ -377,6 +377,7 @@
                         <configuration>
                             <target>
                                 <delete file="${project.build.directory}/helm-charts/dependencies-values.yaml" />
+                                <delete file="${project.build.directory}/helm-charts/dependencies-Chart.yaml" />
                             </target>
                         </configuration>
                     </execution>
@@ -466,7 +467,7 @@
                 <version>${merge-yaml-plugin.version}</version>
                 <executions>
                     <execution>
-                        <id>merge-yaml-files</id>
+                        <id>merge-values-yaml-files</id>
                         <phase>process-resources</phase>
                         <goals>
                             <goal>mergeYaml</goal>
@@ -477,6 +478,22 @@
                                 <file>${project.build.directory}/helm-charts/dependencies-values.yaml</file>
                             </files>
                             <finalYaml>${project.build.directory}/helm-charts/values.yaml</finalYaml>
+                            <flowStyle>BLOCK</flowStyle>
+                            <varSubstitution>MUSTACHE</varSubstitution>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>merge-chart-yaml-files</id>
+                        <phase>process-resources</phase>
+                        <goals>
+                            <goal>mergeYaml</goal>
+                        </goals>
+                        <configuration>
+                            <files>
+                                <file>${project.build.directory}/helm-charts/dependencies-Chart.yaml</file>
+                                <file>${project.build.directory}/helm-charts/Chart.yaml</file>
+                            </files>
+                            <finalYaml>${project.build.directory}/helm-charts/Chart.yaml</finalYaml>
                             <flowStyle>BLOCK</flowStyle>
                             <varSubstitution>MUSTACHE</varSubstitution>
                         </configuration>

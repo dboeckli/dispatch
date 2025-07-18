@@ -1,0 +1,13 @@
+# the first section is ignored. is replaced by the values from the Chart.yaml
+apiVersion: v2
+name: test
+description: test
+type: application
+version: 0.0.1
+appVersion: 0.0.1
+
+dependencies:
+  - name: tracking
+    version: "v0.0.1-SNAPSHOT"
+    repository: "oci://registry-1.docker.io/domboeckli"
+    condition: tracking.enabled
