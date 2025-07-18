@@ -1,4 +1,4 @@
-# this yaml is merged into the values file and deleted before using helm
+# this YAML is merged into the chart file and deleted before using helm and deleted afterward in the target directory
 bitnamiKafkaImage:
   repository: bitnami/kafka
   tag: "3.9.0"
