@@ -56,7 +56,7 @@ spec:
           command: [ 'sh', '-c', 'until nc -z {{ .Values.wiremock.serviceFQDN  }} {{ .Values.wiremock.port }}; do echo "[busybox: wait-for-wiremock] waiting for wiremock"; sleep 2; done; echo "[busybox: wait-for-wiremock] wiremock is available"' ]
       containers:
         - name: {{ .Chart.Name }}
-          image: "{{ .Values.image.registry }}/{{ .Chart.Name }}:{{ .Chart.AppVersion }}"
+          image: "{{ .Values.image.registry }}/@project.artifactId@:{{ .Chart.AppVersion }}"
           imagePullPolicy: {{ .Values.image.pullPolicy }}
           env:
             - name: JAVA_TIMEZONE

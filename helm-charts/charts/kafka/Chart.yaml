@@ -1,5 +1,5 @@
 apiVersion: v2
-name: kafka
+name: dispatch-kafka
 description: A Helm subchart for Kafka
 type: application
 version: @helm.chart.version@
