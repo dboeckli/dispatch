@@ -1,5 +1,5 @@
 apiVersion: v2
-name: wiremock
+name: dispatch-wiremock
 description: A Helm subchart for wiremock
 type: application
 version: @helm.chart.version@
