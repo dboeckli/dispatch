@@ -31,7 +31,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Set up java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 21
           distribution: 'temurin'
@@ -136,7 +136,7 @@ jobs:
       - uses: actions/checkout@v5
 
       - name: Set up java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 21
           distribution: 'temurin'
@@ -285,7 +285,7 @@ jobs:
           fetch-depth: 0
 
       - name: Set up java 21
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: 21
           distribution: 'temurin'
