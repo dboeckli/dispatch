@@ -133,9 +133,9 @@ nc -zv dispatch-kafka.dispatch.svc.cluster.local 29092
 echo "Exit code for port 29092: $?"
 ```
 
-create bitnami/kafka sidecar and open bash
+create bitnamilegacy/kafka sidecar and open bash
 ```powershell
-kubectl run kafka-test --rm -it --image=bitnami/kafka:3.9.0 --namespace=dispatch --command -- bash
+kubectl run kafka-test --rm -it --image=bitnamilegacy/kafka:3.9.0 --namespace=dispatch --command -- bash
 ```
 
 run kafka commands
