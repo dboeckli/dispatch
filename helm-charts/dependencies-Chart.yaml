@@ -8,6 +8,6 @@ appVersion: 0.0.1
 
 dependencies:
   - name: tracking
-    version: "v0.0.1-SNAPSHOT"
+    version: "v0.0.2-SNAPSHOT"
     repository: "oci://registry-1.docker.io/domboeckli"
     condition: tracking.enabled
