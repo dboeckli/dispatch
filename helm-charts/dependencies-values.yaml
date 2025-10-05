@@ -1,7 +1,7 @@
 # this YAML is merged into the chart file and deleted before using helm and deleted afterward in the target directory
 bitnamiKafkaImage:
   repository: bitnamilegacy/kafka
-  tag: "3.9.0"
+  tag: "4.0.0"
   pullPolicy: IfNotPresent
 
 busyboxImage:
