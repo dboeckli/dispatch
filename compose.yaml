@@ -1,6 +1,6 @@
 services:
   kafka:
-    image: confluentinc/cp-kafka:7.9.3
+    image: confluentinc/cp-kafka:7.9.4
     hostname: kafka
     container_name: kafka
     ports:
@@ -50,7 +50,7 @@ services:
 
   tracking-service:
     container_name: tracking-service
-    image: domboeckli/tracking:0.0.1-SNAPSHOT
+    image: domboeckli/tracking:0.0.2-SNAPSHOT
     ports:
       - "8081:8081"
     expose:
