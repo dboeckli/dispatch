@@ -46,7 +46,7 @@
         <editorconfig-maven-plugin.version>0.1.3</editorconfig-maven-plugin.version>
         <helm.plugin.version>6.17.0</helm.plugin.version>
         <properties-maven-plugin.version>1.2.1</properties-maven-plugin.version>
-        <wiremock.version>3.10.6</wiremock.version>
+        <wiremock.version>4.0.7</wiremock.version>
         <merge-yaml-plugin.version>1.4</merge-yaml-plugin.version>
 
         <!-- our dependencies -->
@@ -478,22 +478,6 @@
                                 <file>${project.build.directory}/helm-charts/dependencies-values.yaml</file>
                             </files>
                             <finalYaml>${project.build.directory}/helm-charts/values.yaml</finalYaml>
-                            <flowStyle>BLOCK</flowStyle>
-                            <varSubstitution>MUSTACHE</varSubstitution>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>merge-chart-yaml-files</id>
-                        <phase>process-resources</phase>
-                        <goals>
-                            <goal>mergeYaml</goal>
-                        </goals>
-                        <configuration>
-                            <files>
-                                <file>${project.build.directory}/helm-charts/dependencies-Chart.yaml</file>
-                                <file>${project.build.directory}/helm-charts/Chart.yaml</file>
-                            </files>
-                            <finalYaml>${project.build.directory}/helm-charts/Chart.yaml</finalYaml>
                             <flowStyle>BLOCK</flowStyle>
                             <varSubstitution>MUSTACHE</varSubstitution>
                         </configuration>
