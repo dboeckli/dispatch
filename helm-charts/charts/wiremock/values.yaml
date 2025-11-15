@@ -3,7 +3,7 @@ global:
 
 image:
   repository: wiremock/wiremock
-  tag: "3.13.1"
+  tag: "3.13.2"
   pullPolicy: IfNotPresent
 
 busyboxImage:
