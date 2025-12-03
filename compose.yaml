@@ -1,6 +1,6 @@
 services:
   kafka:
-    image: confluentinc/cp-kafka:7.9.4
+    image: confluentinc/cp-kafka:8.1.1
     hostname: kafka
     container_name: kafka
     ports:
