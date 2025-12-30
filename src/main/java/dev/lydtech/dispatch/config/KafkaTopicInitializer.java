@@ -68,7 +68,7 @@ public class KafkaTopicInitializer implements ApplicationListener<ContextRefresh
                 .until(() -> {
                     try {
                         DescribeTopicsResult resultCheck = adminClient.describeTopics(topicNames);
-                        Map<String, TopicDescription> descriptions = resultCheck.all().get(5, TimeUnit.SECONDS);
+                        Map<String, TopicDescription> descriptions = resultCheck.allTopicNames().get(5, TimeUnit.SECONDS);
                         return descriptions.size() == topicNames.size();
                     } catch (Exception e) {
                         log.warn("Topics not yet available: {}", e.getMessage());
