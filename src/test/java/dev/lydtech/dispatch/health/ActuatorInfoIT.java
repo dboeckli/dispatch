@@ -69,23 +69,27 @@ public class ActuatorInfoIT {
     void kafkaHealthIndicatorTest() throws Exception {
         mockMvc.perform(get("/actuator/health/kafka"))
             .andExpect(status().isOk())
+            .andDo(result -> log.info("Response (pretty):\n{}", pretty(result.getResponse().getContentAsString())))
             .andExpect(jsonPath("$.status").value("UP"))
             .andExpect(jsonPath("$.details.kafkaBootstrapServers").value(bootstrapServers))
             .andExpect(jsonPath("$.details.kafkaResponse").value("Topic: health-check, Partition: 0, Offset: 0"))
-            .andExpect(jsonPath("$.details.clusterId").isNotEmpty())
+            .andExpect(jsonPath("$.details.clusterId").value("Mk3OEYBSD34fcwNTJENDM2Qk_DISPATCH"))
             .andExpect(jsonPath("$.details.nodes").isArray())
-            .andExpect(jsonPath("$.details.nodes[0]").value("localhost:9092"))
+            .andExpect(jsonPath("$.details.nodes[0]").value("kafka:9092"))
             .andExpect(jsonPath("$.details.consumerGroups").isArray())
-            .andExpect(jsonPath("$.details.consumerGroups").isEmpty())
+            .andExpect(jsonPath("$.details.consumerGroups").isArray())
+            .andExpect(jsonPath("$.details.consumerGroups").value(containsInAnyOrder(
+                "dispatch.order.created.group",
+                "tracking.dispatch.tracking"
+            )))
             .andExpect(jsonPath("$.details.topics").isArray())
             .andExpect(jsonPath("$.details.topics").value(containsInAnyOrder(
+                "order.created",
                 "health-check",
-                "drink.request.cool",
-                "drink.prepared",
-                "drink.request.cold",
-                "drink.request.icecold",
-                "order.placed"
-            ))).andDo(result -> log.info("Response:\n{}", result.getResponse().getContentAsString()));
+                "dispatch.tracking",
+                "tracking.status",
+                "order.dispatched"
+            )));
     }
 
     private String pretty(String body) {

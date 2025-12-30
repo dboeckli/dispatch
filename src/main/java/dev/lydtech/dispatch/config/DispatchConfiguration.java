@@ -1,6 +1,5 @@
 package dev.lydtech.dispatch.config;
 
-import com.fasterxml.jackson.databind.JsonSerializer;
 import dev.lydtech.dispatch.error.NotRetryableException;
 import dev.lydtech.dispatch.error.RetryableException;
 import dev.lydtech.message.OrderCreated;
@@ -18,6 +17,7 @@ import org.springframework.kafka.listener.DeadLetterPublishingRecoverer;
 import org.springframework.kafka.listener.DefaultErrorHandler;
 import org.springframework.kafka.support.serializer.ErrorHandlingDeserializer;
 import org.springframework.kafka.support.serializer.JacksonJsonDeserializer;
+import org.springframework.kafka.support.serializer.JacksonJsonSerializer;
 import org.springframework.util.backoff.FixedBackOff;
 
 
@@ -69,7 +69,7 @@ public class DispatchConfiguration {
         config.put(ProducerConfig.BOOTSTRAP_SERVERS_CONFIG, bootstrapServers);
 
         // we do not read anymore from the application.yaml anymore
-        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+        config.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JacksonJsonSerializer.class);
         config.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
 
         return new DefaultKafkaProducerFactory<>(config);
