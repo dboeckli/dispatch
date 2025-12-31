@@ -20,8 +20,8 @@ spec:
     spec:
       containers:
         - name: kafka
-          image: {{ .Values.image.repository }}:{{ .Values.image.tag }}
-          imagePullPolicy: {{ .Values.image.pullPolicy }}
+          image: {{ .Values.kafkaImage.repository }}:{{ .Values.kafkaImage.tag }}
+          imagePullPolicy: {{ .Values.kafkaImage.pullPolicy }}
           ports:
             # PLAINTEXT Listener
             - name: kafka
@@ -35,9 +35,6 @@ spec:
             - name: controller
               containerPort: {{ .Values.kafka.controllerPort }}
               protocol: TCP
-
-
-
           env:
             - name: POD_IP
               valueFrom:
@@ -55,8 +52,6 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            - name: KAFKA_KRAFT_MODE
-              value: "true"
             - name: KAFKA_PROCESS_ROLES
               value: "controller,broker"
             - name: KAFKA_NODE_ID

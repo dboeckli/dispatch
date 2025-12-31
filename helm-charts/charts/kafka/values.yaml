@@ -1,14 +1,9 @@
 global:
   namespace: dispatch
 
-image:
-  repository: confluentinc/cp-kafka
-  tag: "7.9.4"
-  pullPolicy: IfNotPresent
-
-bitnamiKafkaImage:
-  repository: bitnamilegacy/kafka
-  tag: "3.9.0"
+kafkaImage:
+  repository: apache/kafka
+  tag: "4.1.1"
   pullPolicy: IfNotPresent
 
 busyboxImage:
