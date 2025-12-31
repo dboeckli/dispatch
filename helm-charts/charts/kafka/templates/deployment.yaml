@@ -52,10 +52,10 @@ spec:
               valueFrom:
                 fieldRef:
                   fieldPath: metadata.namespace
-            - name: KAFKA_KRAFT_MODE
-              value: "true"
             - name: KAFKA_PROCESS_ROLES
               value: "controller,broker"
+            - name: KAFKA_NODE_ID
+              value: "1"
             - name: KAFKA_CONTROLLER_QUORUM_VOTERS
               value: "1@{{ .Values.kafka.serviceFQDN }}:{{ .Values.kafka.controllerPort }}"
             - name: KAFKA_LISTENERS
