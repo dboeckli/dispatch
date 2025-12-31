@@ -75,8 +75,7 @@ public class ActuatorInfoIT {
             .andExpect(jsonPath("$.details.kafkaResponse").value("Topic: health-check, Partition: 0, Offset: 0"))
             .andExpect(jsonPath("$.details.clusterId").value("Mk3OEYBSD34fcwNTJENDM2Qk_DISPATCH"))
             .andExpect(jsonPath("$.details.nodes").isArray())
-            .andExpect(jsonPath("$.details.nodes[0]").value("kafka:9092"))
-            .andExpect(jsonPath("$.details.consumerGroups").isArray())
+            .andExpect(jsonPath("$.details.nodes[0]").value("localhost:29092"))
             .andExpect(jsonPath("$.details.consumerGroups").isArray())
             .andExpect(jsonPath("$.details.consumerGroups").value(containsInAnyOrder(
                 "dispatch.order.created.group",

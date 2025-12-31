@@ -10,42 +10,45 @@ metadata:
 spec:
   containers:
     - name: test-kafka-connection
-      image: {{ .Values.bitnamiKafkaImage.repository }}:{{ .Values.bitnamiKafkaImage.tag }}
-      imagePullPolicy: {{ .Values.bitnamiKafkaImage.pullPolicy }}
+      image: {{ .Values.kafkaImage.repository }}:{{ .Values.kafkaImage.tag }}
+      imagePullPolicy: {{ .Values.kafkaImage.pullPolicy }}
       command: ['/bin/bash', '-c']
       args:
         - |
           ERROR_OCCURED=0
 
           echo "### Test 1: Checking Kafka broker status"
-          kafka-topics.sh --bootstrap-server {{ include "kafka.fullname" . }}:{{ .Values.kafka.clientPort }} --list
-          echo "Exit code: $?"
+          /opt/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.fullname" . }}:{{ .Values.kafka.clientPort }} --list
+
           if [ $? -ne 0 ]; then
             echo "Failed to connect to Kafka broker"
             ERROR_OCCURED=1
           else
             echo "Successfully connected to Kafka broker"
           fi
+          echo "Exit code: $?"
 
           echo "### Test 2: Creating a test topic"
-          kafka-topics.sh --bootstrap-server {{ include "kafka.fullname" . }}:{{ .Values.kafka.clientPort }} --create --topic test-topic --partitions 1 --replication-factor 1
-          echo "Exit code: $?"
+          /opt/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.fullname" . }}:{{ .Values.kafka.clientPort }} --create --topic test-topic --partitions 1 --replication-factor 1
+
           if [ $? -ne 0 ]; then
             echo "Failed to create test topic"
             ERROR_OCCURED=1
           else
             echo "Successfully created test topic"
           fi
+          echo "Exit code: $?"
 
           echo "### Test 3: Listing topics to verify test topic creation"
-          kafka-topics.sh --bootstrap-server {{ include "kafka.fullname" . }}:{{ .Values.kafka.clientPort }} --list | grep test-topic
-          echo "Exit code: $?"
+          /opt/kafka/bin/kafka-topics.sh --bootstrap-server {{ include "kafka.fullname" . }}:{{ .Values.kafka.clientPort }} --list | grep test-topic
+
           if [ $? -ne 0 ]; then
             echo "Test topic not found in the list"
             ERROR_OCCURED=1
           else
             echo "Test topic successfully created and listed"
           fi
+          echo "Exit code: $?"
 
           if [ $ERROR_OCCURED -ne 0 ]; then
             echo "### Kafka connection test failed"
