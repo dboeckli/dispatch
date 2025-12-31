@@ -16,11 +16,6 @@ spec:
         {{- include "application-template.selectorLabels" . | nindent 8 }}
     spec:
       initContainers:
-        - name: wait-for-kafka-internal
-          image: {{ .Values.busyboxImage.repository }}:{{ .Values.busyboxImage.tag }}
-          imagePullPolicy: {{ .Values.busyboxImage.pullPolicy }}
-          command: [ 'sh', '-c', 'until nc -z {{ .Values.kafka.serviceFQDN  }} {{ .Values.kafka.port }}; do echo "[busybox: wait-for-kafka-internal] waiting for kafka"; sleep 2; done; echo "[busybox: wait-for-kafka-internal] kafka is available"' ]
-
         - name: wait-for-kafka-in-dispatch-ready
           image: {{.Values.kcatImage.repository }}:{{.Values.kcatImage.tag }}
           imagePullPolicy: {{.Values.kcatImage.pullPolicy }}
