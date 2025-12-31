@@ -28,6 +28,10 @@ spec:
             - /scripts/wait-for-kafka.sh
           args:
             - "{{ .Values.kafka.serviceFQDN }}:{{ .Values.kafka.port }}"
+          volumeMounts:
+            - name: scripts
+              mountPath: /scripts
+              readOnly: true
 
         - name: wait-for-wiremock
           image: {{ .Values.busyboxImage.repository }}:{{ .Values.busyboxImage.tag }}
@@ -84,3 +88,7 @@ spec:
           hostPath:
             path: {{ .Values.global.timezonePath }}
             type: ""
+        - name: scripts
+          configMap:
+            name: {{ include "application-template.fullname" . }}-scripts
+            defaultMode: 0555
