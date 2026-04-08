@@ -1,16 +1,16 @@
 {
-    "priority": 1,
-    "request": {
-        "method": "GET",
-        "url": "/actuator/health/readiness"
+  "priority": 1,
+  "request": {
+    "method": "GET",
+    "url": "/actuator/health/readiness"
+  },
+  "response": {
+    "status": 200,
+    "headers": {
+      "Content-Type": "application/json"
     },
-    "response": {
-        "status": 200,
-        "headers": {
-            "Content-Type": "application/json"
-        },
-        "jsonBody": {
-            "status": "UP"
-        }
+    "jsonBody": {
+      "status": "UP"
     }
+  }
 }

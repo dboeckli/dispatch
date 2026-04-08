@@ -69,15 +69,17 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
 
     @Autowired
     private KafkaTestListener testListener;
-    
+
     private final static String ORDER_CREATED_DLT_TOPIC = ORDER_CREATED_TOPIC + "-dlt";
 
     @TestConfiguration
     static class TestConfig {
+
         @Bean
         public KafkaTestListener testListener() {
             return new KafkaTestListener();
         }
+
     }
 
     @DynamicPropertySource
@@ -85,16 +87,21 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
         registry.add("dispatch.stockServiceEndpoint", () -> "${wiremock.server.baseUrl}/api/stock");
     }
 
-    @KafkaListener(groupId = "KafkaIntegrationTest", topics = {DISPATCH_TRACKING_TOPIC, ORDER_DISPATCHED_TOPIC, ORDER_CREATED_DLT_TOPIC})
+    @KafkaListener(groupId = "KafkaIntegrationTest",
+            topics = { DISPATCH_TRACKING_TOPIC, ORDER_DISPATCHED_TOPIC, ORDER_CREATED_DLT_TOPIC })
     protected static class KafkaTestListener {
+
         AtomicInteger dispatchPreparingCounter = new AtomicInteger(0);
+
         AtomicInteger orderDispatchedCounter = new AtomicInteger(0);
+
         AtomicInteger dispatchCompletedCounter = new AtomicInteger(0);
+
         AtomicInteger orderCreatedDLTCounter = new AtomicInteger(0);
 
         @KafkaHandler
         void receiveDispatchPreparing(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                      @Payload DispatchPreparing payload) {
+                @Payload DispatchPreparing payload) {
             log.info("Received DispatchPreparing with key {} and payload: {}", key, payload);
             assertNotNull(key);
             assertNotNull(payload);
@@ -102,8 +109,7 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
         }
 
         @KafkaHandler
-        void receiveOrderDispatched(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                    @Payload OrderDispatched payload) {
+        void receiveOrderDispatched(@Header(KafkaHeaders.RECEIVED_KEY) String key, @Payload OrderDispatched payload) {
             log.info("Received DispatchPreparing with key {} and payload: {}", key, payload);
             assertNotNull(key);
             assertNotNull(payload);
@@ -112,7 +118,7 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
 
         @KafkaHandler
         void receiveDispatchCompleted(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                      @Payload DispatchCompleted payload) {
+                @Payload DispatchCompleted payload) {
             log.info("Received DispatchCompleted with key {} and payload: {}", key, payload);
             assertNotNull(key);
             assertNotNull(payload);
@@ -120,19 +126,19 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
         }
 
         @KafkaHandler
-        void receiveOrderCreatedDLT(@Header(KafkaHeaders.RECEIVED_KEY) String key,
-                                    @Payload OrderCreated payload) {
+        void receiveOrderCreatedDLT(@Header(KafkaHeaders.RECEIVED_KEY) String key, @Payload OrderCreated payload) {
             log.info("Dead Letter Message Received: OrderCreated with key {} and payload: {}", key, payload);
             assertNotNull(key);
             assertNotNull(payload);
             orderCreatedDLTCounter.incrementAndGet();
         }
+
     }
 
     @BeforeEach
     public void setUp() {
         log.info("WireMock URL: {}", wireMockUrl);
-        
+
         testListener.dispatchPreparingCounter.set(0);
         testListener.orderDispatchedCounter.set(0);
         testListener.dispatchCompletedCounter.set(0);
@@ -141,49 +147,38 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
         // Wait until the partitions are assigned.
         registry.getListenerContainers().forEach(container -> {
 
-            await().atMost(30, TimeUnit.SECONDS)
-                .pollInterval(100, TimeUnit.MILLISECONDS)
-                .until(() -> {
-                    Map<String, Collection<TopicPartition>> assignments = container.getAssignmentsByClientId();
-                    int totalPartitions = assignments.values().stream()
-                        .mapToInt(Collection::size)
-                        .sum();
-                    log.info("Current total assigned partitions: {}", totalPartitions);
-                    return totalPartitions >= embeddedKafkaBroker.getPartitionsPerTopic();
-                });
+            await().atMost(30, TimeUnit.SECONDS).pollInterval(100, TimeUnit.MILLISECONDS).until(() -> {
+                Map<String, Collection<TopicPartition>> assignments = container.getAssignmentsByClientId();
+                int totalPartitions = assignments.values().stream().mapToInt(Collection::size).sum();
+                log.info("Current total assigned partitions: {}", totalPartitions);
+                return totalPartitions >= embeddedKafkaBroker.getPartitionsPerTopic();
+            });
 
             Map<String, Collection<TopicPartition>> finalAssignments = container.getAssignmentsByClientId();
-            int finalTotalPartitions = finalAssignments.values().stream()
-                .mapToInt(Collection::size)
-                .sum();
+            int finalTotalPartitions = finalAssignments.values().stream().mapToInt(Collection::size).sum();
             log.info("Final total assigned partitions: {}", finalTotalPartitions);
             ContainerTestUtils.waitForAssignment(container, finalTotalPartitions);
         });
     }
-    
 
     @Test
     public void testOrderCreatedHandler() throws Exception {
         stubFor(get(urlPathMatching("/api/stock.*"))
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody("true")
-            ));
-        
+            .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody("true")));
+
         UUID givenKey = randomUUID();
-        OrderCreated givenOrderCreated = OrderCreated.builder()
-            .orderId(randomUUID())
-            .item("test-item")
-            .build();
+        OrderCreated givenOrderCreated = OrderCreated.builder().orderId(randomUUID()).item("test-item").build();
 
         sendMessage(ORDER_CREATED_TOPIC, givenKey.toString(), givenOrderCreated);
 
-        await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+        await().atMost(3, TimeUnit.SECONDS)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.dispatchPreparingCounter::get, equalTo(1));
-        await().atMost(1, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+        await().atMost(1, TimeUnit.SECONDS)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.orderDispatchedCounter::get, equalTo(1));
-        await().atMost(1, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+        await().atMost(1, TimeUnit.SECONDS)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.dispatchCompletedCounter::get, equalTo(1));
 
         assertThat(testListener.orderCreatedDLTCounter.get(), equalTo(0));
@@ -192,67 +187,55 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
 
     @Test
     public void testOrderDispatchFlow_NotRetryableException() throws Exception {
-        stubFor(get(urlPathMatching("/api/stock.*"))
-            .willReturn(aResponse()
-                .withStatus(400)
-            ));
+        stubFor(get(urlPathMatching("/api/stock.*")).willReturn(aResponse().withStatus(400)));
 
         String givenKey = randomUUID().toString();
-        OrderCreated givenOrderCreated = OrderCreated.builder()
-            .orderId(UUID.randomUUID())
-            .item("test-item")
-            .build();
+        OrderCreated givenOrderCreated = OrderCreated.builder().orderId(UUID.randomUUID()).item("test-item").build();
 
         sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
 
         TimeUnit.SECONDS.sleep(3);
 
-        await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+        await().atMost(3, TimeUnit.SECONDS)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.orderCreatedDLTCounter::get, equalTo(1));
-        
+
         assertThat(testListener.dispatchPreparingCounter.get(), equalTo(0));
         assertThat(testListener.orderDispatchedCounter.get(), equalTo(0));
         assertThat(testListener.dispatchCompletedCounter.get(), equalTo(0));
     }
 
     /**
-     * The call to the stock service is stubbed to initially return a 503 Service Unavailable response, resulting in a
-     * retryable exception being thrown.  On the subsequent attempt it is stubbed to then succeed, so the outbound events
-     * are sent.
+     * The call to the stock service is stubbed to initially return a 503 Service
+     * Unavailable response, resulting in a retryable exception being thrown. On the
+     * subsequent attempt it is stubbed to then succeed, so the outbound events are sent.
      */
     @Test
     public void testOrderDispatchFlow_RetryThenSuccess() throws Exception {
         // First stub: Respond with 503 on the first call
         String TestScenario = "Retry Scenario";
-        stubFor(get(urlPathMatching("/api/stock.*"))
-            .inScenario(TestScenario)
+        stubFor(get(urlPathMatching("/api/stock.*")).inScenario(TestScenario)
             .whenScenarioStateIs(Scenario.STARTED)
-            .willReturn(aResponse()
-                .withStatus(503)
-                .withBody("Service unavailable"))
+            .willReturn(aResponse().withStatus(503).withBody("Service unavailable"))
             .willSetStateTo("Failed Once"));
         // Second stub: Respond with 200 on subsequent calls
-        stubFor(get(urlPathMatching("/api/stock.*"))
-            .inScenario(TestScenario)
+        stubFor(get(urlPathMatching("/api/stock.*")).inScenario(TestScenario)
             .whenScenarioStateIs("Failed Once")
-            .willReturn(aResponse()
-                .withStatus(200)
-                .withHeader("Content-Type", "application/json")
-                .withBody("true")));
+            .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody("true")));
 
         String givenKey = randomUUID().toString();
-        OrderCreated givenOrderCreated = OrderCreated.builder()
-            .orderId(UUID.randomUUID())
-            .item("test-item")
-            .build();
+        OrderCreated givenOrderCreated = OrderCreated.builder().orderId(UUID.randomUUID()).item("test-item").build();
 
         sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
 
-        await().atMost(3, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+        await().atMost(3, TimeUnit.SECONDS)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.dispatchPreparingCounter::get, equalTo(1));
-        await().atMost(1, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+        await().atMost(1, TimeUnit.SECONDS)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.orderDispatchedCounter::get, equalTo(1));
-        await().atMost(1, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+        await().atMost(1, TimeUnit.SECONDS)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.dispatchCompletedCounter::get, equalTo(1));
         assertThat(testListener.orderCreatedDLTCounter.get(), equalTo(0));
     }
@@ -260,35 +243,36 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
     @Test
     public void testOrderDispatchFlow_RetryUntilFailure() throws Exception {
         log.info("### testOrderDispatchFlow_RetryUntilFailure");
-        stubFor(get(urlPathMatching("/api/stock.*"))
-            .willReturn(aResponse()
-                .withStatus(503) // Service unavailable, should be retried
-            ));
+        stubFor(get(urlPathMatching("/api/stock.*")).willReturn(aResponse().withStatus(503) // Service
+                                                                                            // unavailable,
+                                                                                            // should
+                                                                                            // be
+                                                                                            // retried
+        ));
 
         String givenKey = randomUUID().toString();
-        OrderCreated givenOrderCreated = OrderCreated.builder()
-            .orderId(UUID.randomUUID())
-            .item("test-item")
-            .build();
+        OrderCreated givenOrderCreated = OrderCreated.builder().orderId(UUID.randomUUID()).item("test-item").build();
 
         sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
 
         TimeUnit.SECONDS.sleep(3);
-        
-        await().atMost(5, TimeUnit.SECONDS).pollDelay(100, TimeUnit.MILLISECONDS)
+
+        await().atMost(5, TimeUnit.SECONDS)
+            .pollDelay(100, TimeUnit.MILLISECONDS)
             .until(testListener.orderCreatedDLTCounter::get, equalTo(1));
-        
+
         assertThat(testListener.dispatchPreparingCounter.get(), equalTo(0));
         assertThat(testListener.orderDispatchedCounter.get(), equalTo(0));
         assertThat(testListener.dispatchCompletedCounter.get(), equalTo(0));
     }
 
     private void sendMessage(String topic, String key, Object payload) throws Exception {
-        kafkaTemplate.send(MessageBuilder
-            .withPayload(payload)
-            .setHeader(KafkaHeaders.KEY, key)
-            .setHeader(KafkaHeaders.TOPIC, topic)
-            .build()).get();
+        kafkaTemplate
+            .send(MessageBuilder.withPayload(payload)
+                .setHeader(KafkaHeaders.KEY, key)
+                .setHeader(KafkaHeaders.TOPIC, topic)
+                .build())
+            .get();
     }
 
 }
