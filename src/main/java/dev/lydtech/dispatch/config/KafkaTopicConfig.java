@@ -15,7 +15,7 @@ import static dev.lydtech.dispatch.service.DispatchService.ORDER_DISPATCHED_TOPI
 
 @Configuration
 public class KafkaTopicConfig {
-    
+
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
@@ -37,5 +37,5 @@ public class KafkaTopicConfig {
             .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))));
         return topics;
     }
-    
+
 }

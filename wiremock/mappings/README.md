@@ -25,4 +25,3 @@ The service will expose it rest services on port `8888`, which is where the Disp
 
 To test the Wiremock endpoints, you can use the requests defined in the [wiremock.http](../../restRequest/wiremock.http) file.
 
-

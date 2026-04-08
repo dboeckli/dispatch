@@ -8,6 +8,7 @@ import org.junit.jupiter.api.ClassOrdererContext;
 import java.util.Comparator;
 
 public class TestClassOrderer implements ClassOrderer {
+
     private static int getOrder(ClassDescriptor classDescriptor) {
         String actuatorPackage = ActuatorInfoIT.class.getPackage().getName();
         if (classDescriptor.getTestClass().getPackage().getName().equals(actuatorPackage)) {
@@ -26,4 +27,5 @@ public class TestClassOrderer implements ClassOrderer {
     public void orderClasses(ClassOrdererContext classOrdererContext) {
         classOrdererContext.getClassDescriptors().sort(Comparator.comparingInt(TestClassOrderer::getOrder));
     }
+
 }

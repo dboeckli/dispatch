@@ -22,6 +22,7 @@ import static java.util.UUID.randomUUID;
 public class DispatchService {
 
     public static final String ORDER_DISPATCHED_TOPIC = "order.dispatched";
+
     public static final String DISPATCH_TRACKING_TOPIC = "dispatch.tracking";
 
     private static final UUID APPLICATION_ID = randomUUID();
@@ -38,21 +39,22 @@ public class DispatchService {
             this.sendDispatchPreparing(orderCreated, key);
             this.sendOrderDispatched(orderCreated, key);
             this.sendDispatchCompleted(orderCreated, key);
-        } else {
+        }
+        else {
             log.error("### Stock service is not available for item: {}", orderCreated.getItem());
         }
     }
 
-    private void sendDispatchPreparing(OrderCreated orderCreated, String key) throws ExecutionException, InterruptedException {
-        DispatchPreparing dispatchPreparing = DispatchPreparing.builder()
-            .orderId(orderCreated.getOrderId())
-            .build();
+    private void sendDispatchPreparing(OrderCreated orderCreated, String key)
+            throws ExecutionException, InterruptedException {
+        DispatchPreparing dispatchPreparing = DispatchPreparing.builder().orderId(orderCreated.getOrderId()).build();
         kafkaProducer.send(DISPATCH_TRACKING_TOPIC, key, dispatchPreparing).get();
         log.info("\n### DispatchPreparing message for order {}\nhas been sent: {}\nwith key {}\nto {}",
-            dispatchPreparing.getOrderId(), dispatchPreparing, key, DISPATCH_TRACKING_TOPIC);
+                dispatchPreparing.getOrderId(), dispatchPreparing, key, DISPATCH_TRACKING_TOPIC);
     }
 
-    private void sendOrderDispatched(OrderCreated orderCreated, String key) throws ExecutionException, InterruptedException {
+    private void sendOrderDispatched(OrderCreated orderCreated, String key)
+            throws ExecutionException, InterruptedException {
         OrderDispatched orderDispatched = OrderDispatched.builder()
             .orderId(orderCreated.getOrderId())
             .processedById(APPLICATION_ID)
@@ -60,19 +62,23 @@ public class DispatchService {
             .build();
         kafkaProducer.send(ORDER_DISPATCHED_TOPIC, key, orderDispatched).get();
         log.info("\n### OrderDispatched message for order {}\nhas been sent: {}\nwith key {}\nto {}",
-            orderDispatched.getOrderId(), orderDispatched, key, ORDER_DISPATCHED_TOPIC);
+                orderDispatched.getOrderId(), orderDispatched, key, ORDER_DISPATCHED_TOPIC);
     }
 
-    private void sendDispatchCompleted(OrderCreated orderCreated, String key) throws ExecutionException, InterruptedException {
+    private void sendDispatchCompleted(OrderCreated orderCreated, String key)
+            throws ExecutionException, InterruptedException {
         DispatchCompleted dispatchCompleted = DispatchCompleted.builder()
             .orderId(orderCreated.getOrderId())
             .dispatchedDate(LocalDate.now().toString())
             .build();
-        //ProducerRecord<String, Object> completedRecord = new ProducerRecord<>(DISPATCH_TRACKING_TOPIC, key, dispatchCompleted);
-        //completedRecord.headers().add(new RecordHeader("__TypeId__", DispatchCompleted.class.getName().getBytes()));
-        //kafkaProducer.send(completedRecord).get();
+        // ProducerRecord<String, Object> completedRecord = new
+        // ProducerRecord<>(DISPATCH_TRACKING_TOPIC, key, dispatchCompleted);
+        // completedRecord.headers().add(new RecordHeader("__TypeId__",
+        // DispatchCompleted.class.getName().getBytes()));
+        // kafkaProducer.send(completedRecord).get();
         kafkaProducer.send(DISPATCH_TRACKING_TOPIC, key, dispatchCompleted).get();
-        log.info("\n### DispatchCompleted message for order {}\nhas been sent: {}\nwith key {}\nto {}"
-            , dispatchCompleted.getOrderId(), dispatchCompleted, key, DISPATCH_TRACKING_TOPIC);
+        log.info("\n### DispatchCompleted message for order {}\nhas been sent: {}\nwith key {}\nto {}",
+                dispatchCompleted.getOrderId(), dispatchCompleted, key, DISPATCH_TRACKING_TOPIC);
     }
+
 }

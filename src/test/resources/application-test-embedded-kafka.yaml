@@ -1,30 +1,25 @@
+---
 spring:
   application:
-    name: dispatch
+    name: "dispatch"
   kafka:
-    # See: https://docs.conduktor.io/desktop/kafka-cluster-connection/setting-up-a-connection-to-kafka/connecting-to-kafka-running-on-windows-wsl-2/#two-ways-to-fix-this
-    # and: https://stackoverflow.com/questions/46158296/kafka-broker-not-available-at-starting
-    bootstrap-servers: ${spring.embedded.kafka.brokers}
-    
+    bootstrap-servers: "${spring.embedded.kafka.brokers}"
     admin:
       auto-create: false
       properties:
-        bootstrap.servers: ${spring.embedded.kafka.brokers}
+        bootstrap.servers: "${spring.embedded.kafka.brokers}"
     consumer:
-      # configs below are not taken anymore because we have the DispatchConfiguration class
-      bootstrap-servers: ${spring.embedded.kafka.brokers}
+      bootstrap-servers: "${spring.embedded.kafka.brokers}"
       properties:
         spring.json.trusted.packages: "*"
         allow.auto.create.topics: true
-  
   docker:
     compose:
       enabled: false
       stop:
-        command: down
+        command: "down"
       skip:
-        in-tests: true  
-
+        in-tests: true
 management:
   health:
     readinessstate:
@@ -33,20 +28,17 @@ management:
       enabled: true
   endpoints:
     access:
-      default: unrestricted
+      default: "unrestricted"
     web:
       exposure:
         include: "*"
   endpoint:
     configprops:
-      # WARNING: SECURITY RISK - DO NOT USE IN PRODUCTION ENVIRONMENT
-      # This configuration exposes sensitive data and should only be used for development or testing purposes.
-      # Ensure this is disabled in any environment where security is a concern.
-      show-values: ALWAYS
+      show-values: "ALWAYS"
     health:
       probes:
         enabled: true
-      show-details: always
+      show-details: "always"
   info:
     build:
       enabled: true
@@ -58,22 +50,21 @@ management:
       enabled: true
     git:
       enabled: true
-      mode: full
+      mode: "full"
   httpexchanges:
     recording:
       enabled: true
-      include: request_headers, response_headers, session_id, time_taken
+      include: "request_headers, response_headers, session_id, time_taken"
   observations:
     annotations:
       enabled: true
     http:
       server:
         requests:
-          name: http.server.requests
+          name: "http.server.requests"
       client:
         requests:
-          name: http-client-requests
-
+          name: "http-client-requests"
   otlp:
     metrics:
       export:
@@ -84,7 +75,6 @@ management:
         enabled: false
     sampling:
       probability: 1.0
-
   logging:
     export:
       enabled: false
@@ -94,6 +84,5 @@ management:
     metrics:
       export:
         enabled: false
-      
 dispatch:
-  stockServiceEndpoint: http://localhost:7777/api/stock      
+  stockServiceEndpoint: "http://localhost:7777/api/stock"

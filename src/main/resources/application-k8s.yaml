@@ -1,36 +1,33 @@
+---
 server:
   port: 8082
-
 spring:
   application:
-    name: dispatch
-
+    name: "dispatch"
   docker:
     compose:
       enabled: true
       stop:
-        command: down
+        command: "down"
       skip:
         in-tests: true
-
   kafka:
-    bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
+    bootstrap-servers: "${SPRING_KAFKA_BOOTSTRAP_SERVERS}"
     consumer:
-      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
-      group-id: sfg
-      auto-offset-reset: earliest
-      key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
-      value-deserializer: org.springframework.kafka.support.serializer.JsonDeserializer
+      bootstrap-servers: "${SPRING_KAFKA_BOOTSTRAP_SERVERS}"
+      group-id: "sfg"
+      auto-offset-reset: "earliest"
+      key-deserializer: "org.apache.kafka.common.serialization.StringDeserializer"
+      value-deserializer: "org.springframework.kafka.support.serializer.JsonDeserializer"
       properties:
         spring.json.trusted.packages: "*"
         allow.auto.create.topics: false
     producer:
-      bootstrap-servers: ${SPRING_KAFKA_BOOTSTRAP_SERVERS}
-      key-serializer: org.apache.kafka.common.serialization.StringSerializer
-      value-serializer: org.springframework.kafka.support.serializer.JsonSerializer
+      bootstrap-servers: "${SPRING_KAFKA_BOOTSTRAP_SERVERS}"
+      key-serializer: "org.apache.kafka.common.serialization.StringSerializer"
+      value-serializer: "org.springframework.kafka.support.serializer.JsonSerializer"
     properties:
-      client.dns.lookup: use_all_dns_ips
-
+      client.dns.lookup: "use_all_dns_ips"
 management:
   health:
     readinessstate:
@@ -39,20 +36,17 @@ management:
       enabled: true
   endpoints:
     access:
-      default: unrestricted
+      default: "unrestricted"
     web:
       exposure:
         include: "*"
   endpoint:
     configprops:
-      # WARNING: SECURITY RISK - DO NOT USE IN PRODUCTION ENVIRONMENT
-      # This configuration exposes sensitive data and should only be used for development or testing purposes.
-      # Ensure this is disabled in any environment where security is a concern.
-      show-values: ALWAYS
+      show-values: "ALWAYS"
     health:
       probes:
         enabled: true
-      show-details: always
+      show-details: "always"
   info:
     build:
       enabled: true
@@ -64,22 +58,21 @@ management:
       enabled: true
     git:
       enabled: true
-      mode: full
+      mode: "full"
   httpexchanges:
     recording:
       enabled: true
-      include: request_headers, response_headers, session_id, time_taken
+      include: "request_headers, response_headers, session_id, time_taken"
   observations:
     annotations:
       enabled: true
     http:
       server:
         requests:
-          name: http.server.requests
+          name: "http.server.requests"
       client:
         requests:
-          name: http-client-requests
-
+          name: "http-client-requests"
   otlp:
     metrics:
       export:
@@ -90,7 +83,6 @@ management:
         enabled: false
     sampling:
       probability: 1.0
-
   logging:
     export:
       enabled: false
@@ -100,6 +92,5 @@ management:
     metrics:
       export:
         enabled: false
-      
 dispatch:
-  stockServiceEndpoint: http://localhost:30088/api/stock
+  stockServiceEndpoint: "http://localhost:30088/api/stock"

@@ -27,17 +27,22 @@ public class StockServiceHealthIndicator implements HealthIndicator {
 
             if (response != null && response.equals("true")) {
                 if (wasDownLastCheck) {
-                    log.info("Stock Service is now reporting UP status at {}, response was {}", stockServiceEndpoint, response);
+                    log.info("Stock Service is now reporting UP status at {}, response was {}", stockServiceEndpoint,
+                            response);
                     wasDownLastCheck = false;
                 }
                 return Health.up().build();
-            } else {
-                log.warn("Stock Service is not reporting UP status at {}, response was {}", stockServiceEndpoint, response);
+            }
+            else {
+                log.warn("Stock Service is not reporting UP status at {}, response was {}", stockServiceEndpoint,
+                        response);
                 return Health.down().build();
             }
-        } catch (Exception e) {
+        }
+        catch (Exception e) {
             log.warn("Stock Service is not reachable at {}", stockServiceEndpoint, e);
             return Health.down(e).build();
         }
     }
+
 }
