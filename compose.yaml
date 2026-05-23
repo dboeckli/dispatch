@@ -72,7 +72,7 @@ services:
         required: true
 
   busybox:
-    image: busybox:1.37.0
+    image: busybox:1.38.0
     container_name: busybox
     depends_on:
       wiremock:
