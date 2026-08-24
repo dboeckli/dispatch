@@ -64,6 +64,18 @@
             "enabled": false
         },
         {
+            "description": "Private dboeckli Maven packages on GitHub Packages",
+            "matchDatasources": [
+                "maven"
+            ],
+            "matchPackageNames": [
+                "/^dev\\.lydtech\\./"
+            ],
+            "registryUrls": [
+                "https://maven.pkg.github.com/dboeckli/dispatch-tracking-lib"
+            ]
+        },
+        {
             "matchCategories": [
                 "docker"
             ],
