@@ -69,7 +69,7 @@
                 "maven"
             ],
             "matchPackageNames": [
-                "/^dev\\.lydtech\\./"
+                "/^dev\\.lydtech(:|\\.)/"
             ],
             "registryUrls": [
                 "https://maven.pkg.github.com/dboeckli/dispatch-tracking-lib"
