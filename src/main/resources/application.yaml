@@ -72,9 +72,28 @@ management:
       export:
         enabled: false
   tracing:
+    propagation:
+      type: w3c
+      produce: w3c
+      consume: w3c
+    baggage:
+      enabled: true
+      # Specify which baggage fields should be propagated to downstream services
+      correlation:
+        # Also make baggage available in MDC for logging
+        fields:
+          - testBaggage
+        enabled: true
+      # Erlaubt das Empfangen des Headers "baggage: testBaggage=..." der im http request gesetzt wird
+      remote-fields:
+        - testBaggage
+      # KOPIERT den Wert aus dem Baggage in die Span-Labels (Attributes)
+      tag-fields:
+        - testBaggage
     export:
       otlp:
         enabled: false
+      enabled: true
     sampling:
       probability: 1.0
   logging:
@@ -88,3 +107,7 @@ management:
         enabled: false
 dispatch:
   stockServiceEndpoint: "http://localhost:8888/api/stock"
+
+logging:
+  level:
+    org.springframework.web.filter.CommonsRequestLoggingFilter: DEBUG

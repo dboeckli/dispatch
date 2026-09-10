@@ -1,46 +1,82 @@
 ### actuator
+< scripts/traceparent.js
 GET http://localhost:{{application-port}}/actuator
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator info
+< scripts/traceparent.js
 GET http://localhost:{{application-port}}/actuator/info
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator health
+< scripts/traceparent.js
 GET http://localhost:{{application-port}}/actuator/health
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator health kafka
+< scripts/traceparent.js
 GET http://localhost:{{application-port}}/actuator/health/kafka
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator health
+< scripts/traceparent.js
 GET http://localhost:{{application-port}}/actuator/health/readiness
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator health
+< scripts/traceparent.js
 GET http://localhost:{{application-port}}/actuator/health/liveness
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator metrics
+< scripts/traceparent.js
 GET localhost:{{application-port}}/actuator/metrics
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator env
+< scripts/traceparent.js
 GET localhost:{{application-port}}/actuator/env
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator env
+< scripts/traceparent.js
 GET localhost:{{application-port}}/actuator/configprops
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator beans
+< scripts/traceparent.js
 GET localhost:{{application-port}}/actuator/beans
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator caches
+< scripts/traceparent.js
 GET localhost:{{application-port}}/actuator/caches
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator get loggers
+< scripts/traceparent.js
 GET localhost:{{application-port}}/actuator/loggers
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
