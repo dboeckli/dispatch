@@ -1,11 +1,20 @@
 ### actuator health
+< scripts/traceparent.js
 GET http://localhost:{{tracking-service-port}}/actuator/health
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator health kafka
+< scripts/traceparent.js
 GET http://localhost:{{tracking-service-port}}/actuator/health/kafka
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### actuator info
+< scripts/traceparent.js
 GET http://localhost:{{tracking-service-port}}/actuator/info
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch

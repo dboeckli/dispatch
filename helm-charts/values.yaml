@@ -1,3 +1,6 @@
+nameOverride: "dispatch"
+fullnameOverride: "dispatch"
+
 global:
   timezone: Europe/Zurich
   timezonePath: /etc/localtime
@@ -40,23 +43,17 @@ probes:
     failureThreshold: 6
 
 kafka:
+  enabled: true
+  fullnameOverride: "dispatch-kafka"
   serviceFQDN: "dispatch-kafka.dispatch.svc.cluster.local"
   port: 9092
   clientPort: 29092
 
 wiremock:
   enabled: true
+  fullnameOverride: "dispatch-wiremock"
   serviceFQDN: "dispatch-wiremock.dispatch.svc.cluster.local"
   port: 8088
 
 ingress:
   enabled: false
-
-# Section for overriding values in subcharts defined in the Chart.yaml
-tracking:
-  dispatch:
-    enabled: false
-  kafka:
-    enabled: false
-    serviceFQDN: "dispatch-kafka.dispatch.svc.cluster.local"
-    advertisedListenersString: "PLAINTEXT://dispatch-kafka.dispatch.svc.cluster.local:9092,PLAINTEXT_HOST://dispatch-kafka.dispatch.svc.cluster.local:29092"

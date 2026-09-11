@@ -181,3 +181,50 @@ echo '"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item
 
 You can use the actuator rest call to verify via port 30082
 
+## Sandbox (local dev environment)
+
+The sandbox is provisioned by the opencode-sandbox-kit and runs as a Docker container. It mounts this
+repo, starts the agent (opencode/Claude Code/Mammouth), and connects the IntelliJ MCP server.
+
+Allow the kit source (GitHub without cloning):
+
+```powershell
+sbx settings set kit.allowedSources --% "[\"docker.io/\",\"github.com/dboeckli/\"]"
+```
+
+Start a new sandbox:
+
+```powershell
+sbx run opencode `
+    --name dispatch `
+    --static-mcp idea `
+    -t docker/sandbox-templates:opencode-docker-0.5.0 `
+    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    "C:\development\projects\dispatch" `
+    "C:\development\maven-repo:ro"
+```
+
+Start the sandbox with Kubernetes support:
+
+```powershell
+sbx run opencode `
+    --name dispatch `
+    --static-mcp idea `
+    -t docker/sandbox-templates:opencode-docker-0.5.0 `
+    --kit "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
+    "C:\development\projects\dispatch" `
+    "C:\development\maven-repo:ro" `
+    "$env:USERPROFILE\.kube:ro"
+```
+
+Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
+
+```powershell
+sbx kit add dispatch "git+https://github.com/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
+```
+
+Claude Code / Mammouth variants: replace `opencode` by `claude` (template
+`claude-code-docker-0.5.0`) or `mammouth` (kit `#dir=mammouth-agent`, template pin in the spec image).
+The sandbox sets `npm_config_bin_links=false` globally, so no manual export is needed before
+`./mvnw` (see `AGENTS.md`).
+

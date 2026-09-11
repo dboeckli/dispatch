@@ -1,23 +1,41 @@
 ### wiremock stock api (200 response)
+< scripts/traceparent.js
 GET http://localhost:{{wiremock-port}}/api/stock
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### wiremock readyness check (200 response)
+< scripts/traceparent.js
 GET http://localhost:{{wiremock-port}}/actuator/health/readiness
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### wiremock stock api (400 response)
+< scripts/traceparent.js
 GET http://localhost:{{wiremock-port}}/api/stock?item=test_400
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### wiremock stock api (500 response)
+< scripts/traceparent.js
 GET http://localhost:{{wiremock-port}}/api/stock?item=test_500
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### wiremock transient 502 - First request (should return 502)
+< scripts/traceparent.js
 GET http://localhost:{{wiremock-port}}/api/stock?item=test_502
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
 
 ### wiremock transient 502 - Second request (should return 200)
+< scripts/traceparent.js
 GET http://localhost:{{wiremock-port}}/api/stock?item=test_502
 Accept: application/json
+traceparent: 00-{{traceId}}-{{spanId}}-03
+baggage: testBaggage=dispatch
