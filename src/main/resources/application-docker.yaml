@@ -5,13 +5,15 @@ spring:
   application:
     name: "dispatch"
   kafka:
-    bootstrap-servers: "[::1]:29092"
+    # See: https://docs.conduktor.io/desktop/kafka-cluster-connection/setting-up-a-connection-to-kafka/connecting-to-kafka-running-on-windows-wsl-2/#two-ways-to-fix-this
+    # and: https://stackoverflow.com/questions/46158296/kafka-broker-not-available-at-starting
+    bootstrap-servers: "127.0.0.1:29092"
     admin:
       auto-create: false
       properties:
-        bootstrap.servers: "[::1]:29092"
+        bootstrap.servers: "127.0.0.1:29092"
     consumer:
-      bootstrap-servers: "[::1]:29092"
+      bootstrap-servers: "127.0.0.1:29092"
       value-deserializer: "org.springframework.kafka.support.serializer.ErrorHandlingDeserializer"
       auto-offset-reset: "earliest"
       properties:
