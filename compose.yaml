@@ -57,7 +57,7 @@ services:
 
   tracking-service:
     container_name: tracking-service
-    image: domboeckli/tracking:0.0.2-SNAPSHOT
+    image: domboeckli/tracking:0.0.2-snapshot
     ports:
       - "8081:8081"
     expose:
