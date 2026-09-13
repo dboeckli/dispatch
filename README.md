@@ -2,84 +2,81 @@
 
 This repository contains the code to support the [Introduction to Kafka with Spring Boot](https://www.udemy.com/course/introduction-to-kafka-with-spring-boot/?referralCode=15118530CA63AD1AF16D) online course.
 
-The application code is for a message driven service which utilises Kafka and Spring Boot 3.
+The application code is for a message driven service which utilises Kafka and Spring Boot 4.
 
-This application can be tested in two way:
-1. Setting up local Kafka in Wsl (See Kafka.md file) and use the IntelliJ runner
-2. Use IntelliJ runner with docker profile which will start a docker Kafka instance via docker compose
+## Architecture Overview
 
-Send Message:
-For that you need a kafka cli environment which will be available when you have done the kafka wsl setup
+```mermaid
+graph LR
+    Producer(["💻 Order Producer"])
 
-use at home:
+    subgraph Messaging ["Kafka"]
+        OrderCreated[["order.created"]]
+        OrderDispatched[["order.dispatched"]]
+        DispatchTracking[["dispatch.tracking"]]
+    end
 
-```
-cd ~/tools/kafka/kafka_2.13-3.9.0
-```
+    subgraph Backends ["Backend Services"]
+        Dispatch["Dispatch\n:8082 / :30082"]
+        Stock["Stock Service\nWireMock :8888 / :30088"]
+        Tracking["Tracking Service\n:8081"]
+    end
 
-use at work:
-
-```
-cd /opt/development/tools/kafka/kafka_2.13-3.9.0
-```
-
-When started with docker profile use:
-
-```
-bin/kafka-topics.sh --bootstrap-server localhost:29092 --list
-bin/kafka-topics.sh --bootstrap-server 127.0.0.1:29092 --list
-bin/kafka-topics.sh --bootstrap-server [::1]:29092 --list
-```
-
-Send a message to the order.created topic
-
-```
-bin/kafka-console-producer.sh --bootstrap-server [::1]:9092 --topic order.created
->{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"} 
+    Producer -->|"OrderCreated"| OrderCreated
+    OrderCreated -->|"consumes"| Dispatch
+    Dispatch <-->|"HTTP GET /api/stock?item="| Stock
+    Dispatch -->|"OrderDispatched"| OrderDispatched
+    Dispatch -->|"DispatchPreparing / DispatchCompleted"| DispatchTracking
+    DispatchTracking -->|"consumes"| Tracking
 ```
 
-When started with docker
+## Testing
 
+This application is tested with the IntelliJ runner using the `docker` profile, which starts a Docker Kafka
+instance via docker compose.
+
+> Alternative: lokale Kafka-Installation (siehe [docs/Kafka.md](docs/Kafka.md))
+
+### Docker-Profil
+
+In IntelliJ die Run-Config **`DispatchApplication with Docker`** starten (aktives Profil `docker`). Über
+`spring-boot-docker-compose` startet `compose.yaml` automatisch Kafka, WireMock und den Tracking-Service. Kafka ist
+dann über `127.0.0.1:29092` erreichbar (siehe `src/main/resources/application-docker.yaml`).
+
+Topics auflisten:
+
+```bash
+docker exec -it kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server localhost:29092 --list
 ```
-bin/kafka-console-producer.sh --bootstrap-server localhost:29092 --topic order.created
->{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"} 
-```
 
-Send message with key
+Kafka-Shell öffnen:
 
-```
-bin/kafka-console-producer.sh --bootstrap-server localhost:29092 --topic order.created --property parse.key=true --property key.separator=:
->"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}
-```
-
-When started with docker compose and kafka is up and running
-
-open shell of kafka container
-
-```
+```bash
 docker exec -it kafka /bin/bash
 ```
 
-Terminal 1: start a consumer
+Terminal 1: Consumer auf `order.created` starten
 
-```
-./kafka-console-consumer --bootstrap-server localhost:9092 --topic order.created --from-beginning --property print.headers=true
-```
-
-Terminal 2: send a OrderCreated-Message to topic order.created
-
-```
-echo '"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}' | /usr/bin/kafka-console-producer \
-  --bootstrap-server localhost:9092 \
-  --topic order.created \
-  --property parse.key=true \
-  --property "key.separator=:"
+```bash
+/opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 \
+  --topic order.created --from-beginning --property print.headers=true
 ```
 
-### Wiremock
+Terminal 2: `OrderCreated`-Event senden
 
-WIREMOCK UI: http://localhost:30088/__admin/ or http://localhost:8888/__admin/
-See: https://wiremock.org/docs/standalone/admin-api-reference/#tag/Stub-Mappings
+```bash
+echo '"123":{"orderId":"8ed0dc67-41a4-4468-81e1-960340d30c92","item":"first-item"}' \
+ | /usr/bin/kafka-console-producer --bootstrap-server localhost:9092 --topic order.created \
+   --property parse.key=true --property "key.separator=:"
+```
+
+Verifizieren:
+
+- Actuator: `http://localhost:8082/actuator/health` bzw. `/actuator/info`.
+- WireMock Admin: `http://localhost:8888/__admin/` (Kubernetes: `http://localhost:30088/__admin/`) — siehe
+  [WireMock Admin API](https://wiremock.org/docs/standalone/admin-api-reference/#tag/Stub-Mappings).
+- Trace/Baggage manuell auslösen: Requests aus `restRequest/actuator.http` (setzt `traceparent` und
+  `baggage: testBaggage=dispatch`); Logs zeigen `[… traceId-spanId]` und `MDC={testBaggage=…}`.
 
 ### Deployment with Helm
 
@@ -88,10 +85,10 @@ Be aware that we are using a different namespace here (not default).
 To run maven filtering for destination target/helm
 
 ```bash
-mvn clean install -DskipTests 
+./mvnw clean install -DskipTests
 ```
 
-Go to the directory where the tgz file has been created after 'mvn install'
+Go to the directory where the tgz file has been created after './mvnw install'
 
 ```powershell
 cd target/helm/repo
@@ -100,15 +97,15 @@ cd target/helm/repo
 unpack
 
 ```powershell
-$file = Get-ChildItem -Filter dispatch-v*.tgz | Select-Object -First 1
+$file = Get-ChildItem -Filter dispatch-chart-*.tgz | Select-Object -First 1
 tar -xvf $file.Name
 ```
 
 install
 
 ```powershell
-$APPLICATION_NAME = Get-ChildItem -Directory | Where-Object { $_.LastWriteTime -ge $file.LastWriteTime } | Select-Object -ExpandProperty Name
-helm upgrade --install $APPLICATION_NAME ./$APPLICATION_NAME --namespace dispatch --create-namespace --wait --timeout 8m --debug --render-subchart-notes
+$APPLICATION_NAME = "dispatch"
+helm upgrade --install $APPLICATION_NAME ./dispatch-chart --namespace dispatch --create-namespace --wait --timeout 8m --debug --render-subchart-notes
 ```
 
 show logs
@@ -144,7 +141,7 @@ kubectl delete all --all -n dispatch
 create busybox sidecar
 
 ```powershell
-kubectl run busybox-test --rm -it --image=busybox:1.36 --namespace=dispatch --command -- sh
+kubectl run busybox-test --rm -it --image=busybox:1.38.0 --namespace=dispatch --command -- sh
 ```
 
 and analyze kafka connections
