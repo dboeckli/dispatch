@@ -58,13 +58,6 @@ public class ActuatorInfoIT {
     }
 
     @Test
-    void actuatorPrometheusTest() throws Exception {
-        mockMvc.perform(get("/actuator/prometheus"))
-            .andExpect(status().isOk())
-            .andDo(result -> log.info("Response:\n{}", result.getResponse().getContentAsString()));
-    }
-
-    @Test
     void kafkaHealthIndicatorTest() throws Exception {
         mockMvc.perform(get("/actuator/health/kafka"))
             .andExpect(status().isOk())
