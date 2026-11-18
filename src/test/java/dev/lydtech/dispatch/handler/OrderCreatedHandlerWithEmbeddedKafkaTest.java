@@ -53,7 +53,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 @Slf4j
 @EmbeddedKafka(controlledShutdown = true)
 @EnableWireMock
-public class OrderCreatedHandlerWithEmbeddedKafkaTest {
+class OrderCreatedHandlerWithEmbeddedKafkaTest {
 
     @Value("${wiremock.server.baseUrl}")
     private String wireMockUrl;
@@ -70,7 +70,7 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
     @Autowired
     private KafkaTestListener testListener;
 
-    private final static String ORDER_CREATED_DLT_TOPIC = ORDER_CREATED_TOPIC + "-dlt";
+    private static final String ORDER_CREATED_DLT_TOPIC = ORDER_CREATED_TOPIC + "-dlt";
 
     @TestConfiguration
     static class TestConfig {
@@ -136,7 +136,7 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
     }
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         log.info("WireMock URL: {}", wireMockUrl);
 
         testListener.dispatchPreparingCounter.set(0);
@@ -162,7 +162,7 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
     }
 
     @Test
-    public void testOrderCreatedHandler() throws Exception {
+    void testOrderCreatedHandler() throws Exception {
         stubFor(get(urlPathMatching("/api/stock.*"))
             .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody("true")));
 
@@ -186,15 +186,13 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
     }
 
     @Test
-    public void testOrderDispatchFlow_NotRetryableException() throws Exception {
+    void testOrderDispatchFlow_NotRetryableException() throws Exception {
         stubFor(get(urlPathMatching("/api/stock.*")).willReturn(aResponse().withStatus(400)));
 
         String givenKey = randomUUID().toString();
         OrderCreated givenOrderCreated = OrderCreated.builder().orderId(UUID.randomUUID()).item("test-item").build();
 
         sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
-
-        TimeUnit.SECONDS.sleep(3);
 
         await().atMost(3, TimeUnit.SECONDS)
             .pollDelay(100, TimeUnit.MILLISECONDS)
@@ -211,15 +209,15 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
      * subsequent attempt it is stubbed to then succeed, so the outbound events are sent.
      */
     @Test
-    public void testOrderDispatchFlow_RetryThenSuccess() throws Exception {
+    void testOrderDispatchFlow_RetryThenSuccess() throws Exception {
         // First stub: Respond with 503 on the first call
-        String TestScenario = "Retry Scenario";
-        stubFor(get(urlPathMatching("/api/stock.*")).inScenario(TestScenario)
+        String testScenario = "Retry Scenario";
+        stubFor(get(urlPathMatching("/api/stock.*")).inScenario(testScenario)
             .whenScenarioStateIs(Scenario.STARTED)
             .willReturn(aResponse().withStatus(503).withBody("Service unavailable"))
             .willSetStateTo("Failed Once"));
         // Second stub: Respond with 200 on subsequent calls
-        stubFor(get(urlPathMatching("/api/stock.*")).inScenario(TestScenario)
+        stubFor(get(urlPathMatching("/api/stock.*")).inScenario(testScenario)
             .whenScenarioStateIs("Failed Once")
             .willReturn(aResponse().withStatus(200).withHeader("Content-Type", "application/json").withBody("true")));
 
@@ -241,7 +239,7 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
     }
 
     @Test
-    public void testOrderDispatchFlow_RetryUntilFailure() throws Exception {
+    void testOrderDispatchFlow_RetryUntilFailure() throws Exception {
         log.info("### testOrderDispatchFlow_RetryUntilFailure");
         stubFor(get(urlPathMatching("/api/stock.*")).willReturn(aResponse().withStatus(503) // Service
                                                                                             // unavailable,
@@ -254,8 +252,6 @@ public class OrderCreatedHandlerWithEmbeddedKafkaTest {
         OrderCreated givenOrderCreated = OrderCreated.builder().orderId(UUID.randomUUID()).item("test-item").build();
 
         sendMessage(ORDER_CREATED_TOPIC, givenKey, givenOrderCreated);
-
-        TimeUnit.SECONDS.sleep(3);
 
         await().atMost(5, TimeUnit.SECONDS)
             .pollDelay(100, TimeUnit.MILLISECONDS)

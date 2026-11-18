@@ -192,36 +192,10 @@ sbx settings set kit.allowedSources --% "[\"docker.io/\",\"codeberg.org/dboeckli
 Start a new sandbox:
 
 ```powershell
-sbx run opencode `
-    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.cloudsmith.io/dboeckli/sbx/sbx-opencode-tooling:latest `
+sbx run docker.io/domboeckli/sbx-opencode:latest `
     --skills=off `
-    --static-mcp idea `
+    --static-mcp idea,k8s,docker `
     . `
     "C:\development\maven-repo:ro"
 ```
-
-Start the sandbox with Kubernetes support:
-
-```powershell
-sbx run opencode `
-    --kit "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent" `
-    --template docker.cloudsmith.io/dboeckli/sbx/sbx-opencode-tooling:latest `
-    --skills=off `
-    --static-mcp idea `
-    . `
-    "C:\development\maven-repo:ro" `
-    "$env:USERPROFILE\.kube:ro"
-```
-
-Apply the kit to an existing sandbox (restarts the sandbox, VM state is kept):
-
-```powershell
-sbx kit add opencode-dispatch "git+https://codeberg.org/dboeckli/opencode-sandbox-kit.git#dir=opencode-agent"
-```
-
-Claude Code / Mammouth variants: replace `opencode` by `claude` (template
-`docker.cloudsmith.io/dboeckli/sbx/sbx-claude-tooling:latest`) or `mammouth` (kit `#dir=mammouth-agent`, template pin in the spec image).
-The sandbox sets `npm_config_bin_links=false` globally, so no manual export is needed before
-`./mvnw` (see `AGENTS.md`).
 

@@ -34,7 +34,7 @@ class OrderCreatedHandlerTest {
     }
 
     @Test
-    public void testListen_ServiceThrowsException() throws Exception {
+    void testListen_ServiceThrowsException() throws Exception {
         String givenKey = randomUUID().toString();
         Integer givenPartition = 0;
         OrderCreated orderCreated = OrderCreated.builder().orderId(randomUUID()).item("item").build();

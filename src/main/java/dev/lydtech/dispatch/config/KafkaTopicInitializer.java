@@ -43,7 +43,12 @@ public class KafkaTopicInitializer implements ApplicationListener<ContextRefresh
                     adminClient.createTopics(List.of(topic)).all().get(30, TimeUnit.SECONDS);
                     log.info("Topic created successfully: {}", topic.name());
                 }
-                catch (InterruptedException | ExecutionException | TimeoutException e) {
+                catch (InterruptedException e) {
+                    Thread.currentThread().interrupt();
+                    log.warn("Topic creation interrupted for topic: {}", topic.name(), e);
+                    return;
+                }
+                catch (ExecutionException | TimeoutException e) {
                     if (e.getCause() instanceof TopicExistsException) {
                         log.warn("### Topic '{}'", e.getMessage());
                     }
@@ -56,8 +61,28 @@ public class KafkaTopicInitializer implements ApplicationListener<ContextRefresh
         try {
             showTopicDetails();
         }
-        catch (ExecutionException | InterruptedException e) {
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            log.error("Interrupted while checking Kafka topics", e);
+        }
+        catch (ExecutionException e) {
             log.error("Error checking Kafka topics", e);
+        }
+    }
+
+    static boolean topicsAvailable(AdminClient adminClient, List<String> topicNames) {
+        try {
+            DescribeTopicsResult resultCheck = adminClient.describeTopics(topicNames);
+            Map<String, TopicDescription> descriptions = resultCheck.allTopicNames().get(5, TimeUnit.SECONDS);
+            return descriptions.size() == topicNames.size();
+        }
+        catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+            return false;
+        }
+        catch (Exception e) {
+            log.warn("Topics not yet available: {}", e.getMessage());
+            return false;
         }
     }
 
@@ -66,17 +91,9 @@ public class KafkaTopicInitializer implements ApplicationListener<ContextRefresh
             List<String> topicNames = topics.stream().map(NewTopic::name).toList();
 
             log.info("### Waiting for topics to be created: {}", topicNames);
-            await().atMost(30, TimeUnit.SECONDS).pollInterval(1, TimeUnit.SECONDS).until(() -> {
-                try {
-                    DescribeTopicsResult resultCheck = adminClient.describeTopics(topicNames);
-                    Map<String, TopicDescription> descriptions = resultCheck.allTopicNames().get(5, TimeUnit.SECONDS);
-                    return descriptions.size() == topicNames.size();
-                }
-                catch (Exception e) {
-                    log.warn("Topics not yet available: {}", e.getMessage());
-                    return false;
-                }
-            });
+            await().atMost(30, TimeUnit.SECONDS)
+                .pollInterval(1, TimeUnit.SECONDS)
+                .until(() -> topicsAvailable(adminClient, topicNames));
             log.info("### All topics are now available. Describing topic details...");
             DescribeTopicsResult result = adminClient.describeTopics(topicNames);
             try {
