@@ -25,13 +25,13 @@ class StockServiceClientTest {
     private static final String STOCK_SERVICE_QUERY = STOCK_SERVICE_ENDPOINT + "?item=my-item";
 
     @BeforeEach
-    public void setUp() {
+    void setUp() {
         restTemplateMock = mock(RestTemplate.class);
         stockServiceClient = new StockServiceClient(restTemplateMock);
     }
 
     @Test
-    public void testCheckAvailability_Success() {
+    void testCheckAvailability_Success() {
         ResponseEntity<String> response = new ResponseEntity<>("true", HttpStatusCode.valueOf(200));
         when(restTemplateMock.getForEntity(STOCK_SERVICE_QUERY, String.class)).thenReturn(response);
 
@@ -40,7 +40,7 @@ class StockServiceClientTest {
     }
 
     @Test
-    public void testCheckAvailability_ServerError() {
+    void testCheckAvailability_ServerError() {
         doThrow(new HttpServerErrorException(HttpStatusCode.valueOf(500))).when(restTemplateMock)
             .getForEntity(STOCK_SERVICE_QUERY, String.class);
         assertThrows(RetryableException.class, () -> stockServiceClient.checkAvailability("my-item"));
@@ -48,7 +48,7 @@ class StockServiceClientTest {
     }
 
     @Test
-    public void testCheckAvailability_ResourceAccessException() {
+    void testCheckAvailability_ResourceAccessException() {
         doThrow(new ResourceAccessException("access exception")).when(restTemplateMock)
             .getForEntity(STOCK_SERVICE_QUERY, String.class);
         assertThrows(RetryableException.class, () -> stockServiceClient.checkAvailability("my-item"));
@@ -56,7 +56,7 @@ class StockServiceClientTest {
     }
 
     @Test
-    public void testCheckAvailability_NonSuccessStatus() {
+    void testCheckAvailability_NonSuccessStatus() {
         ResponseEntity<String> response = new ResponseEntity<>("body", HttpStatusCode.valueOf(404));
         when(restTemplateMock.getForEntity(STOCK_SERVICE_QUERY, String.class)).thenReturn(response);
 
@@ -67,7 +67,7 @@ class StockServiceClientTest {
     }
 
     @Test
-    public void testCheckAvailability_RuntimeException() {
+    void testCheckAvailability_RuntimeException() {
         doThrow(new RuntimeException("general exception")).when(restTemplateMock)
             .getForEntity(STOCK_SERVICE_QUERY, String.class);
         assertThrows(Exception.class, () -> stockServiceClient.checkAvailability("my-item"));

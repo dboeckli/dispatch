@@ -11,6 +11,7 @@ import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
+import java.time.ZoneId;
 import java.util.UUID;
 import java.util.concurrent.ExecutionException;
 
@@ -69,13 +70,8 @@ public class DispatchService {
             throws ExecutionException, InterruptedException {
         DispatchCompleted dispatchCompleted = DispatchCompleted.builder()
             .orderId(orderCreated.getOrderId())
-            .dispatchedDate(LocalDate.now().toString())
+            .dispatchedDate(LocalDate.now(ZoneId.systemDefault()).toString())
             .build();
-        // ProducerRecord<String, Object> completedRecord = new
-        // ProducerRecord<>(DISPATCH_TRACKING_TOPIC, key, dispatchCompleted);
-        // completedRecord.headers().add(new RecordHeader("__TypeId__",
-        // DispatchCompleted.class.getName().getBytes()));
-        // kafkaProducer.send(completedRecord).get();
         kafkaProducer.send(DISPATCH_TRACKING_TOPIC, key, dispatchCompleted).get();
         log.info("\n### DispatchCompleted message for order {}\nhas been sent: {}\nwith key {}\nto {}",
                 dispatchCompleted.getOrderId(), dispatchCompleted, key, DISPATCH_TRACKING_TOPIC);

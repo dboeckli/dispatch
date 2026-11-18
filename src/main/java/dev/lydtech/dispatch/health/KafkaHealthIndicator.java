@@ -95,11 +95,19 @@ public class KafkaHealthIndicator implements HealthIndicator {
                 .withDetail("topics", topics.stream().map(TopicListing::name).toList())
                 .build();
         }
-        catch (Exception ex) {
-            wasDownLastCheck = true;
-            log.warn("### Kafka Server connection down to {}", kafkaBootstrapServers, ex);
-            return Health.down(ex).withDetail("kafkaBootstrapServers", kafkaBootstrapServers).build();
+        catch (InterruptedException ex) {
+            Thread.currentThread().interrupt();
+            return kafkaDown(ex);
         }
+        catch (Exception ex) {
+            return kafkaDown(ex);
+        }
+    }
+
+    private Health kafkaDown(Exception exception) {
+        wasDownLastCheck = true;
+        log.warn("### Kafka Server connection down to {}", kafkaBootstrapServers, exception);
+        return Health.down(exception).withDetail("kafkaBootstrapServers", kafkaBootstrapServers).build();
     }
 
 }

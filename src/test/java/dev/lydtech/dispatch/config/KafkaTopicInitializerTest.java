@@ -24,13 +24,17 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
 
+import static org.assertj.core.api.Assertions.assertThat;
+import static org.assertj.core.api.Assertions.assertThatThrownBy;
 import static org.assertj.core.api.Assertions.assertThatCode;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyCollection;
 import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.ArgumentMatchers.anyMap;
+import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
@@ -95,6 +99,55 @@ class KafkaTopicInitializerTest {
         assertThatCode(() -> topicInitializer.onApplicationEvent(event)).doesNotThrowAnyException();
 
         verify(adminClient).createTopics(anyCollection());
+    }
+
+    @Test
+    void propagatesFailureWhenAdminClientCannotBeClosed() throws Exception {
+        stubCreateTopics(KafkaFuture.completedFuture(null));
+        stubTopicDetails();
+        doThrow(new RuntimeException("close failed")).when(adminClient).close();
+
+        assertThatThrownBy(() -> topicInitializer.onApplicationEvent(event)).isInstanceOf(RuntimeException.class);
+    }
+
+    @Test
+    void reinterruptsWhenTopicCreationIsInterrupted() throws Exception {
+        stubCreateTopics(interruptedFuture());
+
+        assertThatCode(() -> topicInitializer.onApplicationEvent(event)).doesNotThrowAnyException();
+
+        assertThat(Thread.currentThread().isInterrupted()).isTrue();
+        Thread.interrupted();
+        verify(adminClient, never()).describeTopics(anyCollection());
+    }
+
+    @Test
+    void reinterruptsWhenCheckingTopicsIsInterrupted() throws Exception {
+        stubCreateTopics(KafkaFuture.completedFuture(null));
+        stubTopicConfigs();
+
+        DescribeTopicsResult describeTopicsResult = mock(DescribeTopicsResult.class);
+        when(describeTopicsResult.allTopicNames()).thenReturn(KafkaFuture.completedFuture(descriptions()));
+        when(adminClient.describeTopics(anyCollection())).thenReturn(describeTopicsResult).thenAnswer(invocation -> {
+            throw new InterruptedException("interrupted");
+        });
+
+        assertThatCode(() -> topicInitializer.onApplicationEvent(event)).doesNotThrowAnyException();
+
+        assertThat(Thread.currentThread().isInterrupted()).isTrue();
+        Thread.interrupted();
+    }
+
+    @Test
+    void reportsTopicsUnavailableWhenInterrupted() throws Exception {
+        when(adminClient.describeTopics(anyCollection())).thenAnswer(invocation -> {
+            throw new InterruptedException("interrupted");
+        });
+
+        assertThat(KafkaTopicInitializer.topicsAvailable(adminClient, List.of(TOPIC_NAME))).isFalse();
+
+        assertThat(Thread.currentThread().isInterrupted()).isTrue();
+        Thread.interrupted();
     }
 
     @Test
@@ -186,6 +239,12 @@ class KafkaTopicInitializerTest {
     }
 
     @SuppressWarnings("unchecked")
+    private KafkaFuture<Void> interruptedFuture() throws Exception {
+        KafkaFuture<Void> future = mock(KafkaFuture.class);
+        when(future.get(anyLong(), any(TimeUnit.class))).thenThrow(new InterruptedException("interrupted"));
+        return future;
+    }
+
     private KafkaFuture<Void> failedFuture(ExecutionException exception) throws Exception {
         KafkaFuture<Void> future = mock(KafkaFuture.class);
         when(future.get(anyLong(), any(TimeUnit.class))).thenThrow(exception);

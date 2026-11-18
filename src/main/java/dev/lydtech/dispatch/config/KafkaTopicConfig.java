@@ -16,6 +16,8 @@ import static dev.lydtech.dispatch.service.DispatchService.ORDER_DISPATCHED_TOPI
 @Configuration
 public class KafkaTopicConfig {
 
+    private static final String RETENTION_MS = "retention.ms";
+
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
 
@@ -30,11 +32,11 @@ public class KafkaTopicConfig {
     public List<NewTopic> topics() {
         List<NewTopic> topics = new ArrayList<>();
         topics.add(new NewTopic(ORDER_CREATED_TOPIC, 5, (short) 1)
-            .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))));
+            .configs(Collections.singletonMap(RETENTION_MS, String.valueOf(3600000))));
         topics.add(new NewTopic(ORDER_DISPATCHED_TOPIC, 1, (short) 1)
-            .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))));
+            .configs(Collections.singletonMap(RETENTION_MS, String.valueOf(3600000))));
         topics.add(new NewTopic(DISPATCH_TRACKING_TOPIC, 1, (short) 1)
-            .configs(Collections.singletonMap("retention.ms", String.valueOf(3600000))));
+            .configs(Collections.singletonMap(RETENTION_MS, String.valueOf(3600000))));
         return topics;
     }
 

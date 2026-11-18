@@ -9,6 +9,7 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
 import org.springframework.kafka.core.KafkaTemplate;
+import org.springframework.kafka.support.SendResult;
 
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
@@ -32,6 +33,10 @@ class DispatchServiceTest {
     @Mock
     private StockServiceClient stockServiceClientMock;
 
+    private CompletableFuture<SendResult<String, Object>> completableFuture() {
+        return mock(CompletableFuture.class);
+    }
+
     @BeforeEach
     void setUp() {
         kafkaProducerMock = mock(KafkaTemplate.class);
@@ -43,12 +48,13 @@ class DispatchServiceTest {
     void testProcess_Success() throws Exception {
         String givenKey = randomUUID().toString();
 
+        CompletableFuture<SendResult<String, Object>> future = completableFuture();
         when(kafkaProducerMock.send(eq(DISPATCH_TRACKING_TOPIC), eq(givenKey), any(DispatchPreparing.class)))
-            .thenReturn(mock(CompletableFuture.class));
+            .thenReturn(future);
         when(kafkaProducerMock.send(eq(ORDER_DISPATCHED_TOPIC), eq(givenKey), any(OrderDispatched.class)))
-            .thenReturn(mock(CompletableFuture.class));
+            .thenReturn(future);
         when(kafkaProducerMock.send(eq(DISPATCH_TRACKING_TOPIC), eq(givenKey), any(DispatchCompleted.class)))
-            .thenReturn(mock(CompletableFuture.class));
+            .thenReturn(future);
 
         when(stockServiceClientMock.checkAvailability(anyString())).thenReturn("true");
 
@@ -69,8 +75,9 @@ class DispatchServiceTest {
     void testProcess_OrderDispatchedProducerThrowsException() {
         String givenKey = randomUUID().toString();
 
+        CompletableFuture<SendResult<String, Object>> future = completableFuture();
         when(kafkaProducerMock.send(eq(DISPATCH_TRACKING_TOPIC), eq(givenKey), any(DispatchPreparing.class)))
-            .thenReturn(mock(CompletableFuture.class));
+            .thenReturn(future);
         String errorMessage = "order dispatched producer failure";
         doThrow(new RuntimeException(errorMessage)).when(kafkaProducerMock)
             .send(eq(ORDER_DISPATCHED_TOPIC), eq(givenKey), any(OrderDispatched.class));
@@ -104,7 +111,7 @@ class DispatchServiceTest {
     }
 
     @Test
-    public void testProcess_DispatchTrackingProducerThrowsException() {
+    void testProcess_DispatchTrackingProducerThrowsException() {
         String givenKey = randomUUID().toString();
         String errorMessage = "dispatch tracking producer failure";
         doThrow(new RuntimeException(errorMessage)).when(kafkaProducerMock)
@@ -124,13 +131,14 @@ class DispatchServiceTest {
     }
 
     @Test
-    public void testProcess_DispatchCompletedProducerThrowsException() {
+    void testProcess_DispatchCompletedProducerThrowsException() {
         String givenKey = randomUUID().toString();
         String errorMessage = "dispatch tracking completed producer failure";
+        CompletableFuture<SendResult<String, Object>> future = completableFuture();
         when(kafkaProducerMock.send(eq(DISPATCH_TRACKING_TOPIC), eq(givenKey), any(DispatchPreparing.class)))
-            .thenReturn(mock(CompletableFuture.class));
+            .thenReturn(future);
         when(kafkaProducerMock.send(eq(ORDER_DISPATCHED_TOPIC), eq(givenKey), any(OrderDispatched.class)))
-            .thenReturn(mock(CompletableFuture.class));
+            .thenReturn(future);
         doThrow(new RuntimeException(errorMessage)).when(kafkaProducerMock)
             .send(eq(DISPATCH_TRACKING_TOPIC), eq(givenKey), any(DispatchCompleted.class));
 

@@ -36,7 +36,7 @@ import static org.junit.jupiter.api.Assertions.*;
 @ActiveProfiles("docker")
 @DirtiesContext
 @Slf4j
-public class OrderCreatedHandlerIT {
+class OrderCreatedHandlerIT {
 
     @Value("${spring.kafka.bootstrap-servers}")
     private String bootstrapServers;
@@ -95,7 +95,7 @@ public class OrderCreatedHandlerIT {
     }
 
     @Test
-    public void testOrderCreatedHandler() {
+    void testOrderCreatedHandler() {
         String givenKey = randomUUID().toString();
         OrderCreated givenOrderCreated = OrderCreated.builder().orderId(UUID.randomUUID()).item("test-item").build();
 
@@ -127,12 +127,12 @@ public class OrderCreatedHandlerIT {
         log.info("### OrderCreated message count: {}", records.count());
         assertFalse(records.isEmpty() || records.count() == 0, "Expected OrderCreated records, but none were received");
 
-        ConsumerRecord<String, OrderCreated> record = null;
+        ConsumerRecord<String, OrderCreated> createdRecord = null;
         for (ConsumerRecord<String, OrderCreated> r : records) {
-            record = r;
+            createdRecord = r;
         }
-        assertNotNull(record, "orderCreated record is null");
-        OrderCreated orderCreated = record.value();
+        assertNotNull(createdRecord, "orderCreated record is null");
+        OrderCreated orderCreated = createdRecord.value();
 
         assertNotNull(orderCreated, "orderCreated message is null");
         return orderCreated.getOrderId();
@@ -146,12 +146,12 @@ public class OrderCreatedHandlerIT {
         assertFalse(records.isEmpty() || records.count() == 0,
                 "Expected OrderDispatched records, but none were received");
 
-        ConsumerRecord<String, OrderDispatched> record = null;
+        ConsumerRecord<String, OrderDispatched> dispatchedRecord = null;
         for (ConsumerRecord<String, OrderDispatched> r : records) {
-            record = r;
+            dispatchedRecord = r;
         }
-        assertNotNull(record, "OrderDispatched record is null");
-        OrderDispatched orderDispatched = record.value();
+        assertNotNull(dispatchedRecord, "OrderDispatched record is null");
+        OrderDispatched orderDispatched = dispatchedRecord.value();
 
         assertNotNull(orderDispatched, "OrderDispatched message is null");
         return orderDispatched.getOrderId();
@@ -165,15 +165,15 @@ public class OrderCreatedHandlerIT {
         assertFalse(records.isEmpty() || records.count() == 0,
                 "Expected DispatchPreparing records, but none were received");
 
-        ConsumerRecord<String, DispatchPreparing> record = null;
+        ConsumerRecord<String, DispatchPreparing> preparingRecord = null;
         for (ConsumerRecord<String, DispatchPreparing> r : records) {
             if (r.value() instanceof DispatchPreparing) {
-                record = r;
+                preparingRecord = r;
                 break;
             }
         }
-        assertNotNull(record, "DispatchPreparing record is null");
-        DispatchPreparing orderDispatchPreparing = record.value();
+        assertNotNull(preparingRecord, "DispatchPreparing record is null");
+        DispatchPreparing orderDispatchPreparing = preparingRecord.value();
 
         assertNotNull(orderDispatchPreparing, "DispatchPreparing message is null");
         return orderDispatchPreparing.getOrderId();
@@ -187,15 +187,15 @@ public class OrderCreatedHandlerIT {
         assertFalse(records.isEmpty() || records.count() == 0,
                 "Expected DispatchCompleted records, but none were received");
 
-        ConsumerRecord<String, DispatchCompleted> record = null;
+        ConsumerRecord<String, DispatchCompleted> completedRecord = null;
         for (ConsumerRecord<String, DispatchCompleted> r : records) {
             if (r.value() instanceof DispatchCompleted) {
-                record = r;
+                completedRecord = r;
                 break;
             }
         }
-        assertNotNull(record, "orderDispatchCompleted record is null");
-        DispatchCompleted orderDispatchCompleted = record.value();
+        assertNotNull(completedRecord, "DispatchCompleted record is null");
+        DispatchCompleted orderDispatchCompleted = completedRecord.value();
 
         assertNotNull(orderDispatchCompleted, "orderDispatchCompleted message is null");
         return orderDispatchCompleted.getOrderId();

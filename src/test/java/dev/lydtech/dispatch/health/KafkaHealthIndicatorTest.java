@@ -23,6 +23,7 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 import static org.assertj.core.api.Assertions.assertThat;
 import static org.assertj.core.api.Assertions.assertThatCode;
@@ -96,6 +97,19 @@ class KafkaHealthIndicatorTest {
 
         assertThat(health.getStatus()).isEqualTo(Status.DOWN);
         assertThat(health.getDetails()).containsEntry("kafkaBootstrapServers", BOOTSTRAP_SERVERS);
+    }
+
+    @Test
+    void reportsDownAndReinterruptsWhenInterrupted() throws Exception {
+        CompletableFuture<SendResult<String, Object>> future = mock(CompletableFuture.class);
+        when(future.get(5, TimeUnit.SECONDS)).thenThrow(new InterruptedException("interrupted"));
+        when(kafkaTemplate.send("health-check", "health-check-message")).thenReturn(future);
+
+        Health health = healthIndicator.health();
+
+        assertThat(health.getStatus()).isEqualTo(Status.DOWN);
+        assertThat(Thread.currentThread().isInterrupted()).isTrue();
+        Thread.interrupted();
     }
 
     @Test
