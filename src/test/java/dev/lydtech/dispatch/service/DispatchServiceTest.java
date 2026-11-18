@@ -90,6 +90,20 @@ class DispatchServiceTest {
     }
 
     @Test
+    void testProcess_StockServiceNotAvailable() throws Exception {
+        String givenKey = randomUUID().toString();
+
+        when(stockServiceClientMock.checkAvailability(anyString())).thenReturn("false");
+
+        OrderCreated orderCreated = OrderCreated.builder().orderId(UUID.randomUUID()).item("item").build();
+
+        service.process(givenKey, orderCreated);
+
+        verify(stockServiceClientMock, times(1)).checkAvailability(anyString());
+        verifyNoInteractions(kafkaProducerMock);
+    }
+
+    @Test
     public void testProcess_DispatchTrackingProducerThrowsException() {
         String givenKey = randomUUID().toString();
         String errorMessage = "dispatch tracking producer failure";

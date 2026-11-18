@@ -56,6 +56,17 @@ class StockServiceClientTest {
     }
 
     @Test
+    public void testCheckAvailability_NonSuccessStatus() {
+        ResponseEntity<String> response = new ResponseEntity<>("body", HttpStatusCode.valueOf(404));
+        when(restTemplateMock.getForEntity(STOCK_SERVICE_QUERY, String.class)).thenReturn(response);
+
+        Exception exception = assertThrows(Exception.class, () -> stockServiceClient.checkAvailability("my-item"));
+
+        assertThat(exception.getMessage(), equalTo("error 404 NOT_FOUND"));
+        verify(restTemplateMock, times(1)).getForEntity(STOCK_SERVICE_QUERY, String.class);
+    }
+
+    @Test
     public void testCheckAvailability_RuntimeException() {
         doThrow(new RuntimeException("general exception")).when(restTemplateMock)
             .getForEntity(STOCK_SERVICE_QUERY, String.class);
